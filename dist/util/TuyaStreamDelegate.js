@@ -19,10 +19,7 @@ class TuyaStreamingDelegate {
     controller;
     pendingSessions = {};
     ongoingSessions = {};
-    snapshotCache;
     snapshotPromise;
-    static SNAPSHOT_CACHE_MAX_AGE = 30 * 1000;
-    static SNAPSHOT_STALE_MAX_AGE = 5 * 60 * 1000;
     static SNAPSHOT_TIMEOUT = 12 * 1000;
     camera;
     hap;
@@ -142,25 +139,13 @@ class TuyaStreamingDelegate {
     async handleSnapshotRequest(request, callback) {
         try {
             this.camera.log.debug(`Snapshot requested: ${request.width} x ${request.height}`);
-            const snapshot = await this.getSnapshot();
+            const snapshot = await this.snapshotRequest();
             this.camera.log.debug('Sending snapshot');
             callback(undefined, snapshot);
         }
         catch (error) {
             callback(error);
         }
-    }
-    /**
-     * Starts fetching a fresh frame before HomeKit asks for the doorbell preview.
-     * A concurrent HomeKit snapshot request reuses this same promise.
-     */
-    prewarmSnapshot() {
-        if (!this.camera.device.online) {
-            return;
-        }
-        void this.getSnapshot(true)
-            .then(() => this.camera.log.debug('Doorbell snapshot prewarmed.'))
-            .catch(error => this.camera.log.warn(`Unable to prewarm doorbell snapshot: ${error}`));
     }
     async prepareStream(request, callback) {
         const videoIncomingPort = await (0, camera_utils_1.reservePorts)({
@@ -316,19 +301,9 @@ class TuyaStreamingDelegate {
         this.ongoingSessions[request.sessionID] = activeSession;
         delete this.pendingSessions[request.sessionID];
     }
-    cachedSnapshot(maxAge) {
-        if (this.snapshotCache && Date.now() - this.snapshotCache.createdAt <= maxAge) {
-            return this.snapshotCache.buffer;
-        }
-        return undefined;
-    }
     snapshotRequest() {
         if (!this.snapshotPromise) {
             const request = this.fetchSnapshot()
-                .then(buffer => {
-                this.snapshotCache = { buffer, createdAt: Date.now() };
-                return buffer;
-            })
                 .finally(() => {
                 if (this.snapshotPromise === request) {
                     this.snapshotPromise = undefined;
@@ -340,33 +315,6 @@ class TuyaStreamingDelegate {
             this.camera.log.debug('Reusing in-flight snapshot request.');
         }
         return this.snapshotPromise;
-    }
-    async getSnapshot(forceRefresh = false) {
-        if (!forceRefresh) {
-            const freshSnapshot = this.cachedSnapshot(TuyaStreamingDelegate.SNAPSHOT_CACHE_MAX_AGE);
-            if (freshSnapshot) {
-                this.camera.log.debug('Serving cached snapshot.');
-                return freshSnapshot;
-            }
-            const staleSnapshot = this.cachedSnapshot(TuyaStreamingDelegate.SNAPSHOT_STALE_MAX_AGE);
-            if (staleSnapshot) {
-                this.camera.log.debug('Serving the last cached frame while refreshing it in the background.');
-                void this.snapshotRequest()
-                    .catch(error => this.camera.log.warn(`Background snapshot refresh failed: ${error}`));
-                return staleSnapshot;
-            }
-        }
-        try {
-            return await this.snapshotRequest();
-        }
-        catch (error) {
-            const staleSnapshot = this.cachedSnapshot(TuyaStreamingDelegate.SNAPSHOT_STALE_MAX_AGE);
-            if (staleSnapshot) {
-                this.camera.log.warn('Snapshot refresh failed; serving the last cached frame.');
-                return staleSnapshot;
-            }
-            throw error;
-        }
     }
     async fetchSnapshot() {
         if (!this.camera.device.online) {

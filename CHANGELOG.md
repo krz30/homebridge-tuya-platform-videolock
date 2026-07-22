@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0-videolock.4] - 2026-07-22
+
+### Changed
+- Remove persistent and stale snapshot caching so HomeKit previews always request a current frame.
+- Keep only in-flight request deduplication; simultaneous HomeKit snapshot requests still share one Tuya/FFmpeg operation.
+- Remove doorbell snapshot prewarming because it could compete with live streaming when Tuya was slow to produce frames.
+
 ## [1.7.0-videolock.3] - 2026-07-22
 
 ### Changed

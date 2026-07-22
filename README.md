@@ -2,7 +2,7 @@
 
 > Independent fork of [@0x5e/homebridge-tuya-platform](https://github.com/0x5e/homebridge-tuya-platform), published under a different package name so it is never overwritten by that plugin's own updates.
 >
-> **Adds:** `VideoLockAccessory` — support for Tuya's `videolock` category (a smart lock with an integrated camera/doorbell), exposing `LockMechanism` + `Doorbell` + `CameraController` as a single HomeKit accessory. The fork also prewarms and caches doorbell snapshots, deduplicates concurrent snapshot requests, and starts Tuya stream allocation during the HomeKit prepare handshake. See `src/accessory/VideoLockAccessory.ts`.
+> **Adds:** `VideoLockAccessory` — support for Tuya's `videolock` category (a smart lock with an integrated camera/doorbell), exposing `LockMechanism` + `Doorbell` + `CameraController` as a single HomeKit accessory. The fork also deduplicates concurrent snapshot requests and starts Tuya stream allocation during the HomeKit prepare handshake. See `src/accessory/VideoLockAccessory.ts`.
 >
 > Everything below this point is the original upstream README.
 
