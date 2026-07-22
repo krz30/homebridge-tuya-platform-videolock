@@ -6,11 +6,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "PLACEHOLDER_REPO_URL"
+    "url": "https://github.com/krz30/homebridge-tuya-platform-videolock"
   },
-  "homepage": "PLACEHOLDER_REPO_URL#readme",
+  "homepage": "https://github.com/krz30/homebridge-tuya-platform-videolock#readme",
   "bugs": {
-    "url": "PLACEHOLDER_REPO_URL/issues"
+    "url": "https://github.com/krz30/homebridge-tuya-platform-videolock/issues"
   },
   "funding": [
     {
