@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0-videolock.6] - 2026-07-22
+
+### Changed
+- Reduce the snapshot FFmpeg timeout from 12s to 7s so failures surface before Homebridge's slow-handler watchdog warns.
+- Add `-rtsp_transport tcp -analyzeduration 0 -probesize 32000 -fflags nobuffer+discardcorrupt` to the snapshot FFmpeg command to reach the first frame faster.
+- No caching added: latency-only fix, per the caching restriction in AGENTS.md.
+
 ## [1.7.0-videolock.5] - 2026-07-22
 
 ### Added

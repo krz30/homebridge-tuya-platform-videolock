@@ -25,7 +25,7 @@ Lee esos archivos en ese orden. Son las fuentes públicas de verdad; no inventes
 - Repository/package: `homebridge-tuya-platform-videolock`.
 - Independent MIT fork of `@0x5e/homebridge-tuya-platform`.
 - Homebridge platform alias: `TuyaPlatform`.
-- Documented package version: `1.7.0-videolock.5`.
+- Documented package version: `1.7.0-videolock.6`.
 - Previous known-good `.4` runtime rollback commit: `a257de9dbb499f65ca918d3cfe0932898ae5bbe0`.
 - Documentation baseline commit: `470892b466dc99b9f7e67481131e807fd1ef32fc`.
 
@@ -41,7 +41,7 @@ Implemented:
 - Doorbell events from Tuya DP codes `doorbell` or `doorbell_call`.
 - Tuya RTSP allocation begins in HomeKit `prepareStream`.
 - FFmpeg converts cloud RTSP into HomeKit SRTP; `options.cameraMaxFPS` selects 15 or 30 fps, defaulting to 15.
-- Snapshots have a 12-second timeout.
+- Snapshots have a 7-second timeout, tuned to fail inside Homebridge's slow-handler watchdog window instead of past it.
 - Only simultaneous snapshot requests are deduplicated. Completed snapshots are not cached.
 - Timing logs distinguish Tuya allocation from FFmpeg and end-to-end first-frame delay.
 

@@ -24,7 +24,7 @@ class TuyaStreamingDelegate {
     pendingSessions = {};
     ongoingSessions = {};
     snapshotPromise;
-    static SNAPSHOT_TIMEOUT = 12 * 1000;
+    static SNAPSHOT_TIMEOUT = 7 * 1000;
     camera;
     hap;
     constructor(camera) {
@@ -329,6 +329,10 @@ class TuyaStreamingDelegate {
         const startedAt = Date.now();
         const rtspUrl = await this.retrieveDeviceRTSP('snapshot');
         const ffmpegArgs = [
+            '-rtsp_transport', 'tcp',
+            '-analyzeduration', '0',
+            '-probesize', '32000',
+            '-fflags', 'nobuffer+discardcorrupt',
             '-i', rtspUrl,
             '-frames:v', '1',
             '-hide_banner',

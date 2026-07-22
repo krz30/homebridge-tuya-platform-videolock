@@ -88,7 +88,7 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
 
   private snapshotPromise?: Promise<Buffer>;
 
-  private static readonly SNAPSHOT_TIMEOUT = 12 * 1000;
+  private static readonly SNAPSHOT_TIMEOUT = 7 * 1000;
 
   private readonly camera: BaseAccessory;
   private readonly hap: HAP;
@@ -492,6 +492,10 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
     const rtspUrl = await this.retrieveDeviceRTSP('snapshot');
 
     const ffmpegArgs = [
+      '-rtsp_transport', 'tcp',
+      '-analyzeduration', '0',
+      '-probesize', '32000',
+      '-fflags', 'nobuffer+discardcorrupt',
       '-i', rtspUrl,
       '-frames:v', '1',
       '-hide_banner',
