@@ -36,6 +36,12 @@ Pin a release or commit so production cannot change unexpectedly:
 npm install github:krz30/homebridge-tuya-platform-videolock#<release-or-commit>
 ```
 
+Example pinned to the currently documented build (`1.7.0-videolock.6`, commit `b1822b5`):
+
+```bash
+npm install github:krz30/homebridge-tuya-platform-videolock#b1822b5
+```
+
 The currently documented build is version `1.7.0-videolock.6`. Pin its Git commit after installation so production cannot move unexpectedly.
 
 ### Quick start
@@ -107,6 +113,12 @@ Instala una versión o commit fijo:
 
 ```bash
 npm install github:krz30/homebridge-tuya-platform-videolock#<version-o-commit>
+```
+
+Ejemplo fijado a la compilación documentada actual (`1.7.0-videolock.6`, commit `b1822b5`):
+
+```bash
+npm install github:krz30/homebridge-tuya-platform-videolock#b1822b5
 ```
 
 La compilación documentada corresponde a `1.7.0-videolock.6`. Fija su commit de Git después de instalar para evitar cambios inesperados. Crea el proyecto Tuya, autoriza las APIs, instala solo este fork, configura Homebridge localmente y reinicia. Consulta [Configuración](docs/CONFIGURATION.md) para los detalles.
