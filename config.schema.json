@@ -269,6 +269,22 @@
                             }
                         }
                     },
+                    "cameraMaxFPS": {
+                        "title": "Camera Maximum Frame Rate",
+                        "description": "Maximum frame rate advertised to HomeKit for Tuya cameras and video locks.",
+                        "type": "integer",
+                        "default": 15,
+                        "oneOf": [
+                            {
+                                "title": "15 FPS (recommended for lower CPU usage)",
+                                "enum": [15]
+                            },
+                            {
+                                "title": "30 FPS",
+                                "enum": [30]
+                            }
+                        ]
+                    },
                     "debug": {
                         "title": "Enable Debug Logging",
                         "type": "boolean",
@@ -439,6 +455,7 @@
             "expanded": false,
             "notitle": false,
             "items": [
+                "options.cameraMaxFPS",
                 "options.debug",
                 "options.debugLevel"
             ]

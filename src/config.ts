@@ -27,6 +27,7 @@ export interface TuyaPlatformCustomConfigOptions {
   username: string;
   password: string;
   deviceOverrides?: Array<TuyaPlatformDeviceConfig>;
+  cameraMaxFPS?: 15 | 30;
   debug?: boolean;
   debugLevel?: string;
 }
@@ -42,6 +43,7 @@ export interface TuyaPlatformHomeConfigOptions {
   appSchema: string;
   homeWhitelist?: Array<number>;
   deviceOverrides?: Array<TuyaPlatformDeviceConfig>;
+  cameraMaxFPS?: 15 | 30;
   debug?: boolean;
   debugLevel?: string;
 }
@@ -58,6 +60,7 @@ export const customOptionsSchema = {
     accessId: { type: 'string', required: true },
     accessKey: { type: 'string', required: true },
     deviceOverrides: { 'type': 'array' },
+    cameraMaxFPS: { type: 'integer', enum: [15, 30] },
     debug: { type: 'boolean' },
     debugLevel: { 'type': 'string' },
   },
@@ -74,6 +77,7 @@ export const homeOptionsSchema = {
     appSchema: { 'type': 'string', required: true },
     homeWhitelist: { 'type': 'array' },
     deviceOverrides: { 'type': 'array' },
+    cameraMaxFPS: { type: 'integer', enum: [15, 30] },
     debug: { type: 'boolean' },
     debugLevel: { 'type': 'string' },
   },

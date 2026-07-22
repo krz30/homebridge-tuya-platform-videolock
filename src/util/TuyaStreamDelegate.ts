@@ -40,6 +40,10 @@ import { spawn } from 'child_process';
 import { createSocket, Socket } from 'dgram';
 import { FfmpegStreamingProcess, StreamingDelegate as FfmpegStreamingDelegate } from './FfmpegStreamingProcess';
 
+export function resolveCameraMaxFPS(value: unknown): 15 | 30 {
+  return value === 30 ? 30 : 15;
+}
+
 interface SessionInfo {
     address: string; // address of the HAP controller
     addressVersion: 'ipv4' | 'ipv6';
@@ -94,17 +98,18 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
 
     // this.recordingDelegate = new TuyaRecordingDelegate();
 
+    const maxFPS = resolveCameraMaxFPS(camera.platform.options.cameraMaxFPS);
     const resolutions: Resolution[] = [
-      [320, 180, 15],
-      [320, 240, 15],
-      [480, 270, 15],
-      [480, 360, 15],
-      [640, 360, 15],
-      [640, 480, 15],
-      [1280, 720, 15],
-      [1280, 960, 15],
-      [1920, 1080, 15],
-      [1600, 1200, 15],
+      [320, 180, maxFPS],
+      [320, 240, maxFPS],
+      [480, 270, maxFPS],
+      [480, 360, maxFPS],
+      [640, 360, maxFPS],
+      [640, 480, maxFPS],
+      [1280, 720, maxFPS],
+      [1280, 960, maxFPS],
+      [1920, 1080, maxFPS],
+      [1600, 1200, maxFPS],
     ];
 
     const streamingOptions: CameraStreamingOptions = {

@@ -1,5 +1,17 @@
 import { describe, expect, jest, test } from '@jest/globals';
-import { TuyaStreamingDelegate } from '../src/util/TuyaStreamDelegate';
+import { resolveCameraMaxFPS, TuyaStreamingDelegate } from '../src/util/TuyaStreamDelegate';
+
+describe('resolveCameraMaxFPS', () => {
+  test.each([
+    [undefined, 15],
+    [15, 15],
+    [30, 30],
+    [60, 15],
+    ['30', 15],
+  ])('resolves %p to %i fps', (configured, expected) => {
+    expect(resolveCameraMaxFPS(configured)).toBe(expected);
+  });
+});
 
 function createDelegate() {
   const delegate = Object.create(TuyaStreamingDelegate.prototype) as {

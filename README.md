@@ -17,7 +17,7 @@ AI maintainers: start with [`AGENTS.md`](AGENTS.md). Claude also discovers [`CLA
 - `LockMechanism`, `Doorbell`, and `CameraController` on the same HomeKit accessory.
 - Doorbell notifications from Tuya `doorbell` or `doorbell_call` data points.
 - Tuya RTSP allocation during HomeKit's prepare handshake to reduce startup delay.
-- Live H.264 video transcoded by FFmpeg to HomeKit SRTP at up to 15 fps.
+- Live H.264 video transcoded by FFmpeg to HomeKit SRTP with a selectable 15 or 30 fps profile (15 by default).
 - Fresh snapshots with a 12-second timeout; only concurrent requests share work. There is no persistent snapshot cache, so previews do not intentionally reuse an old frame.
 - Timing logs that separate Tuya allocation from FFmpeg/first-frame delay.
 
@@ -36,7 +36,7 @@ Pin a release or commit so production cannot change unexpectedly:
 npm install github:krz30/homebridge-tuya-platform-videolock#<release-or-commit>
 ```
 
-For the currently documented build, use version `1.7.0-videolock.4` or commit `a257de9dbb499f65ca918d3cfe0932898ae5bbe0`.
+The currently documented build is version `1.7.0-videolock.5`. Pin its Git commit after installation so production cannot move unexpectedly.
 
 ### Quick start
 
@@ -59,6 +59,7 @@ A sanitized Smart Home example:
     "username": "REPLACE_WITH_APP_ACCOUNT",
     "password": "REPLACE_WITH_APP_PASSWORD",
     "appSchema": "smartlife",
+    "cameraMaxFPS": 15,
     "debug": false
   }
 }
@@ -89,7 +90,7 @@ These placeholders are literal; Homebridge JSON does not expand environment vari
 - `LockMechanism`, `Doorbell` y `CameraController` en un solo accesorio de HomeKit.
 - Notificaciones del timbre mediante los data points `doorbell` o `doorbell_call`.
 - Reserva del RTSP de Tuya durante la preparación de HomeKit para reducir la espera inicial.
-- Video H.264 convertido por FFmpeg a SRTP de HomeKit, hasta 15 fps.
+- Video H.264 convertido por FFmpeg a SRTP de HomeKit, seleccionable entre 15 o 30 fps (15 por defecto).
 - Capturas nuevas con límite de 12 segundos; solo las solicitudes simultáneas comparten trabajo. No existe caché persistente de previews.
 - Logs de tiempo separados para Tuya, FFmpeg y el primer frame.
 
@@ -108,7 +109,7 @@ Instala una versión o commit fijo:
 npm install github:krz30/homebridge-tuya-platform-videolock#<version-o-commit>
 ```
 
-La compilación documentada corresponde a `1.7.0-videolock.4`, commit `a257de9dbb499f65ca918d3cfe0932898ae5bbe0`. Crea el proyecto Tuya, autoriza las APIs, instala solo este fork, configura Homebridge localmente y reinicia. Consulta [Configuración](docs/CONFIGURATION.md) para los detalles.
+La compilación documentada corresponde a `1.7.0-videolock.5`. Fija su commit de Git después de instalar para evitar cambios inesperados. Crea el proyecto Tuya, autoriza las APIs, instala solo este fork, configura Homebridge localmente y reinicia. Consulta [Configuración](docs/CONFIGURATION.md) para los detalles.
 
 ## License / Licencia
 

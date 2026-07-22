@@ -24,6 +24,7 @@ Authorize at least Authorization Token Management, Device Status Notification, I
 | `options.endpoint` | no | inferred | Override only when regional login needs it. |
 | `options.homeWhitelist` | no | all homes | Limits discovery to selected home IDs. |
 | `options.deviceOverrides` | no | none | Category, bridging, or DP schema overrides. |
+| `options.cameraMaxFPS` | no | `15` | Advertises camera profiles at either `15` or `30` fps. |
 | `options.debug` | no | `false` | Enables diagnostic logs. |
 | `options.debugLevel` | no | all debug scopes | Comma-separated `api` and/or device IDs. |
 
@@ -45,6 +46,7 @@ Requires `endpoint`, `accessId`, and `accessKey`. It discovers assets through th
     "username": "REPLACE_WITH_APP_ACCOUNT",
     "password": "REPLACE_WITH_APP_PASSWORD",
     "appSchema": "smartlife",
+    "cameraMaxFPS": 15,
     "debug": false
   }
 }
@@ -56,6 +58,6 @@ Do not post debug logs without redacting IDs, usernames, URLs, tokens, `local_ke
 
 El plugin usa la configuración de plataforma de Homebridge, no variables de entorno. El `config.json` real debe quedarse únicamente en el host y nunca subirse a Git.
 
-Para Smart Home son obligatorios `accessId`, `accessKey`, `countryCode`, `username`, `password` y `appSchema`; `endpoint`, filtros, overrides y debug son opcionales. Para un proyecto Custom son obligatorios `endpoint`, `accessId` y `accessKey`. Autoriza Token Management, Device Status Notification, IoT Core, IoT Video Live Stream y Smart Lock Open Service.
+Para Smart Home son obligatorios `accessId`, `accessKey`, `countryCode`, `username`, `password` y `appSchema`; `endpoint`, filtros, overrides, `cameraMaxFPS` y debug son opcionales. `cameraMaxFPS` permite elegir `15` o `30`, con `15` por defecto. Para un proyecto Custom son obligatorios `endpoint`, `accessId` y `accessKey`. Autoriza Token Management, Device Status Notification, IoT Core, IoT Video Live Stream y Smart Lock Open Service.
 
 Los valores del ejemplo son marcadores literales: JSON de Homebridge no sustituye variables automáticamente. Antes de compartir logs, elimina credenciales, IDs, URLs firmadas, datos de ubicación y archivos de inventario Tuya.

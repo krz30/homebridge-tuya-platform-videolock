@@ -10,15 +10,15 @@ The project uses Jest 29 with `ts-jest`. Install dependencies with `npm ci` befo
 ```bash
 npm run lint
 npm run build
-npm test -- --runInBand test/TuyaStreamDelegate.test.ts test/FanAccessory.test.ts test/Light.test.ts
+npm test -- --runInBand test/Config.test.ts test/TuyaStreamDelegate.test.ts test/FanAccessory.test.ts test/Light.test.ts
 npm pack --dry-run --json
 ```
 
-The focused command currently covers 34 tests and does not require a live Homebridge development profile. `test/custom.test.ts` and `test/home.test.ts` are integration-style suites that expect `~/.homebridge-dev/config.json`; do not claim a clean full suite unless that local fixture exists and the run succeeds.
+The focused command currently covers 42 tests across four suites and does not require a live Homebridge development profile. `test/custom.test.ts` and `test/home.test.ts` are integration-style suites that expect `~/.homebridge-dev/config.json`; do not claim a clean full suite unless that local fixture exists and the run succeeds.
 
 ### Writing tests
 
-Tests live in `test/` and follow `*.test.ts`. Camera timing and cloud calls should be mocked; never put a real device ID, signed RTSP URL, account, password, or Tuya key in a fixture. For snapshot behavior, test both concurrent deduplication and a new request after the previous promise settles.
+Tests live in `test/` and follow `*.test.ts`. `test/Config.test.ts` verifies accepted camera frame-rate values. Camera timing and cloud calls should be mocked; never put a real device ID, signed RTSP URL, account, password, or Tuya key in a fixture. For snapshot behavior, test both concurrent deduplication and a new request after the previous promise settles.
 
 ### Coverage and CI
 

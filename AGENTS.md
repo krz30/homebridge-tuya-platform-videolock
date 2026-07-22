@@ -25,8 +25,8 @@ Lee esos archivos en ese orden. Son las fuentes públicas de verdad; no inventes
 - Repository/package: `homebridge-tuya-platform-videolock`.
 - Independent MIT fork of `@0x5e/homebridge-tuya-platform`.
 - Homebridge platform alias: `TuyaPlatform`.
-- Documented package version: `1.7.0-videolock.4`.
-- Last runtime implementation commit documented here: `a257de9dbb499f65ca918d3cfe0932898ae5bbe0`.
+- Documented package version: `1.7.0-videolock.5`.
+- Previous known-good `.4` runtime rollback commit: `a257de9dbb499f65ca918d3cfe0932898ae5bbe0`.
 - Documentation baseline commit: `470892b466dc99b9f7e67481131e807fd1ef32fc`.
 
 Do not confuse the package name with the platform alias. The original plugin and this fork must not run together because both register `TuyaPlatform`.
@@ -40,7 +40,7 @@ Implemented:
 - One HomeKit accessory combining `LockMechanism`, a real `Doorbell`, and `CameraController`.
 - Doorbell events from Tuya DP codes `doorbell` or `doorbell_call`.
 - Tuya RTSP allocation begins in HomeKit `prepareStream`.
-- FFmpeg converts cloud RTSP into HomeKit SRTP; advertised profiles are capped at 15 fps.
+- FFmpeg converts cloud RTSP into HomeKit SRTP; `options.cameraMaxFPS` selects 15 or 30 fps, defaulting to 15.
 - Snapshots have a 12-second timeout.
 - Only simultaneous snapshot requests are deduplicated. Completed snapshots are not cached.
 - Timing logs distinguish Tuya allocation from FFmpeg and end-to-end first-frame delay.
@@ -79,12 +79,12 @@ For runtime changes:
 npm ci
 npm run lint
 npm run build
-npm test -- --runInBand test/TuyaStreamDelegate.test.ts test/FanAccessory.test.ts test/Light.test.ts
+npm test -- --runInBand test/Config.test.ts test/TuyaStreamDelegate.test.ts test/FanAccessory.test.ts test/Light.test.ts
 npm pack --dry-run --json
 git add -f dist
 ```
 
-The focused command is the known credential-free baseline: 3 suites and 34 tests. `test/custom.test.ts` and `test/home.test.ts` require a private local `~/.homebridge-dev/config.json`; do not claim the full suite passes unless that fixture exists and the run actually succeeds.
+The focused command is the known credential-free baseline: 4 suites and 42 tests. `test/custom.test.ts` and `test/home.test.ts` require a private local `~/.homebridge-dev/config.json`; do not claim the full suite passes unless that fixture exists and the run actually succeeds.
 
 After editing:
 

@@ -3,10 +3,14 @@
 /* eslint-disable max-len */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TuyaStreamingDelegate = void 0;
+exports.resolveCameraMaxFPS = resolveCameraMaxFPS;
 const camera_utils_1 = require("@homebridge/camera-utils");
 const child_process_1 = require("child_process");
 const dgram_1 = require("dgram");
 const FfmpegStreamingProcess_1 = require("./FfmpegStreamingProcess");
+function resolveCameraMaxFPS(value) {
+    return value === 30 ? 30 : 15;
+}
 /*
 interface SampleRateEntry {
     type: AudioRecordingCodecType;
@@ -27,17 +31,18 @@ class TuyaStreamingDelegate {
         this.camera = camera;
         this.hap = camera.platform.api.hap;
         // this.recordingDelegate = new TuyaRecordingDelegate();
+        const maxFPS = resolveCameraMaxFPS(camera.platform.options.cameraMaxFPS);
         const resolutions = [
-            [320, 180, 15],
-            [320, 240, 15],
-            [480, 270, 15],
-            [480, 360, 15],
-            [640, 360, 15],
-            [640, 480, 15],
-            [1280, 720, 15],
-            [1280, 960, 15],
-            [1920, 1080, 15],
-            [1600, 1200, 15],
+            [320, 180, maxFPS],
+            [320, 240, maxFPS],
+            [480, 270, maxFPS],
+            [480, 360, maxFPS],
+            [640, 360, maxFPS],
+            [640, 480, maxFPS],
+            [1280, 720, maxFPS],
+            [1280, 960, maxFPS],
+            [1920, 1080, maxFPS],
+            [1600, 1200, maxFPS],
         ];
         const streamingOptions = {
             supportedCryptoSuites: [0 /* SRTPCryptoSuites.AES_CM_128_HMAC_SHA1_80 */],

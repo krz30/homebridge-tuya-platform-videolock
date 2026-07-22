@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.0-videolock.5] - 2026-07-22
+
+### Added
+- Add a Homebridge configuration selector for 15 or 30 FPS camera profiles.
+- Keep 15 FPS as the default for existing installations and lower-power hosts.
+
 ## [1.7.0-videolock.4] - 2026-07-22
 
 ### Changed
