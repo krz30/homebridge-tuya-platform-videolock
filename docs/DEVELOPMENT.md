@@ -1,6 +1,8 @@
 <!-- generated-by: gsd-doc-writer -->
 # Development and Handoff / Desarrollo y continuidad
 
+AI or human maintainers should begin with [`AGENTS.md`](../AGENTS.md); Claude-specific discovery is provided by [`CLAUDE.md`](../CLAUDE.md).
+
 ## English
 
 ### Current project state

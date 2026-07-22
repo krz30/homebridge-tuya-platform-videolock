@@ -5,6 +5,8 @@ Independent Homebridge plugin fork that adds Tuya `videolock` devices as one Hom
 
 [English](#english) · [Español](#español) · [Architecture / Arquitectura](docs/ARCHITECTURE.md) · [Security / Seguridad](SECURITY.md)
 
+AI maintainers: start with [`AGENTS.md`](AGENTS.md). Claude also discovers [`CLAUDE.md`](CLAUDE.md).
+
 > This is an independent fork of [@0x5e/homebridge-tuya-platform](https://github.com/0x5e/homebridge-tuya-platform). It uses a different package name and is not an official Tuya or upstream release.
 
 ## English
@@ -74,6 +76,7 @@ These placeholders are literal; Homebridge JSON does not expand environment vari
 - [Deployment and rollback](docs/DEPLOYMENT.md)
 - [Contributing](CONTRIBUTING.md)
 - [Security](SECURITY.md)
+- [AI handoff / Guía para agentes](AGENTS.md)
 - [Supported upstream device categories](SUPPORTED_DEVICES.md)
 - [Advanced device overrides](ADVANCED_OPTIONS.md)
 - [Changelog](CHANGELOG.md)
