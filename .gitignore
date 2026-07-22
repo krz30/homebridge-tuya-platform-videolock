@@ -76,6 +76,21 @@ web_modules/
 # dotenv environment variables file
 .env
 .env.test
+.env.*
+!.env.example
+
+# Local credentials, deployment state, and private operator artifacts
+keys/
+backups/
+.planning/
+config.json
+auth.json
+credentials.json
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
