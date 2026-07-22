@@ -11,7 +11,7 @@ class FfmpegStreamingProcess {
     process;
     killTimeout;
     stdin;
-    constructor(sessionId, videoProcessor, ffmpegArgs, log, delegate, callback) {
+    constructor(sessionId, videoProcessor, ffmpegArgs, log, delegate, callback, startupStartedAt = Date.now()) {
         log.debug(`Stream command: ${videoProcessor} ${ffmpegArgs.map(value => JSON.stringify(value)).join(' ')}`);
         let started = false;
         const startTime = Date.now();
@@ -22,12 +22,13 @@ class FfmpegStreamingProcess {
             if (progress) {
                 if (!started && progress.frame > 0) {
                     started = true;
-                    const runtime = (Date.now() - startTime) / 1000;
-                    const message = 'Getting the first frames took ' + runtime + ' seconds.';
-                    if (runtime < 5) {
+                    const ffmpegRuntime = (Date.now() - startTime) / 1000;
+                    const totalRuntime = (Date.now() - startupStartedAt) / 1000;
+                    const message = `Getting the first frames took ${totalRuntime} seconds (${ffmpegRuntime} seconds in FFmpeg).`;
+                    if (totalRuntime < 5) {
                         log.debug(message);
                     }
-                    else if (runtime < 22) {
+                    else if (totalRuntime < 22) {
                         log.warn(message);
                     }
                     else {

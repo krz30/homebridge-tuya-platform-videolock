@@ -1,7 +1,7 @@
 {
   "name": "homebridge-tuya-platform-videolock",
   "displayName": "Tuya (VideoLock fork)",
-  "version": "1.7.0-videolock.2",
+  "version": "1.7.0-videolock.3",
   "description": "Independent fork of @0x5e/homebridge-tuya-platform adding support for Tuya's 'videolock' category (lock + doorbell + camera in one HomeKit accessory).",
   "license": "MIT",
   "repository": {

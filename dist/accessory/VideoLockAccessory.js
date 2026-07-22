@@ -90,6 +90,7 @@ class VideoLockAccessory extends BaseAccessory_1.default {
         const doorbellStatus = status.find(_status => _status.code === doorbellSchema.code);
         if (doorbellStatus && doorbellStatus.value === true && this.intialized) {
             this.log.info('Doorbell ring detected.');
+            this.stream?.prewarmSnapshot();
             this.getDoorbellService().getCharacteristic(this.Characteristic.ProgrammableSwitchEvent)
                 .updateValue(0); // SINGLE_PRESS
         }

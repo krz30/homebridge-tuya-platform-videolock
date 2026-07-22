@@ -55,6 +55,9 @@ interface SessionInfo {
     audioCryptoSuite: SRTPCryptoSuites;
     audioSRTP: Buffer;
     audioSSRC: number;
+
+    preparedAt: number;
+    rtspUrlPromise: Promise<{ url: string } | { error: Error }>;
 }
 
 type ActiveSession = {
@@ -79,6 +82,13 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
   private pendingSessions: { [index: string]: SessionInfo } = {};
   private ongoingSessions: { [index: string]: ActiveSession } = {};
 
+  private snapshotCache?: { buffer: Buffer; createdAt: number };
+  private snapshotPromise?: Promise<Buffer>;
+
+  private static readonly SNAPSHOT_CACHE_MAX_AGE = 30 * 1000;
+  private static readonly SNAPSHOT_STALE_MAX_AGE = 5 * 60 * 1000;
+  private static readonly SNAPSHOT_TIMEOUT = 12 * 1000;
+
   private readonly camera: BaseAccessory;
   private readonly hap: HAP;
   constructor(camera: BaseAccessory) {
@@ -88,17 +98,16 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
     // this.recordingDelegate = new TuyaRecordingDelegate();
 
     const resolutions: Resolution[] = [
-      [320, 180, 30],
+      [320, 180, 15],
       [320, 240, 15],
-      [320, 240, 30],
-      [480, 270, 30],
-      [480, 360, 30],
-      [640, 360, 30],
-      [640, 480, 30],
-      [1280, 720, 30],
-      [1280, 960, 30],
-      [1920, 1080, 30],
-      [1600, 1200, 30],
+      [480, 270, 15],
+      [480, 360, 15],
+      [640, 360, 15],
+      [640, 480, 15],
+      [1280, 720, 15],
+      [1280, 960, 15],
+      [1920, 1080, 15],
+      [1600, 1200, 15],
     ];
 
     const streamingOptions: CameraStreamingOptions = {
@@ -214,7 +223,7 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
     try {
       this.camera.log.debug(`Snapshot requested: ${request.width} x ${request.height}`);
 
-      const snapshot = await this.fetchSnapshot();
+      const snapshot = await this.getSnapshot();
 
       this.camera.log.debug('Sending snapshot');
 
@@ -222,6 +231,20 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
     } catch (error) {
       callback(error as Error);
     }
+  }
+
+  /**
+   * Starts fetching a fresh frame before HomeKit asks for the doorbell preview.
+   * A concurrent HomeKit snapshot request reuses this same promise.
+   */
+  prewarmSnapshot() {
+    if (!this.camera.device.online) {
+      return;
+    }
+
+    void this.getSnapshot(true)
+      .then(() => this.camera.log.debug('Doorbell snapshot prewarmed.'))
+      .catch(error => this.camera.log.warn(`Unable to prewarm doorbell snapshot: ${error}`));
   }
 
   async prepareStream(
@@ -253,6 +276,14 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
       videoSRTP: Buffer.concat([request.video.srtp_key, request.video.srtp_salt]),
       videoSSRC: videoSSRC,
       videoIncomingPort: videoIncomingPort[0],
+
+      preparedAt: Date.now(),
+      // Allocate the cloud stream while HomeKit completes its prepare/start handshake.
+      rtspUrlPromise: this.retrieveDeviceRTSP('live stream')
+        .then(url => ({ url }))
+        .catch(error => ({
+          error: error instanceof Error ? error : new Error(String(error)),
+        })),
     };
 
     const response: PrepareStreamResponse = {
@@ -303,13 +334,21 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
     }
   }
 
-  private async retrieveDeviceRTSP(): Promise<string> {
+  private async retrieveDeviceRTSP(purpose: string): Promise<string> {
+    const startedAt = Date.now();
     const data = await this.camera.deviceManager.api.post(
       `/v1.0/devices/${this.camera.device.id}/stream/actions/allocate`,
       {
         type: 'rtsp',
       },
     );
+
+    const elapsed = (Date.now() - startedAt) / 1000;
+    this.camera.log.debug(`Tuya allocated ${purpose} source in ${elapsed.toFixed(3)} seconds.`);
+
+    if (!data.success || !data.result?.url) {
+      throw new Error(`Tuya did not allocate a ${purpose} source.`);
+    }
 
     return data.result.url;
   }
@@ -320,6 +359,7 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
     if (!sessionInfo) {
       this.camera.log.error('Error finding session information.');
       callback(new Error('Error finding session information'));
+      return;
     }
 
     const vcodec = 'libx264';
@@ -328,7 +368,13 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
     const fps = request.video.fps;
     const videoBitrate = request.video.max_bit_rate;
 
-    const rtspUrl = await this.retrieveDeviceRTSP();
+    const source = await sessionInfo.rtspUrlPromise;
+    if ('error' in source) {
+      delete this.pendingSessions[request.sessionID];
+      callback(source.error);
+      return;
+    }
+    const rtspUrl = source.url;
 
     const ffmpegArgs: string[] = [
       '-hide_banner',
@@ -425,10 +471,67 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
       this.camera.log,
       this,
       callback,
+      sessionInfo.preparedAt,
     );
 
     this.ongoingSessions[request.sessionID] = activeSession;
     delete this.pendingSessions[request.sessionID];
+  }
+
+  private cachedSnapshot(maxAge: number): Buffer | undefined {
+    if (this.snapshotCache && Date.now() - this.snapshotCache.createdAt <= maxAge) {
+      return this.snapshotCache.buffer;
+    }
+    return undefined;
+  }
+
+  private snapshotRequest(): Promise<Buffer> {
+    if (!this.snapshotPromise) {
+      const request: Promise<Buffer> = this.fetchSnapshot()
+        .then(buffer => {
+          this.snapshotCache = { buffer, createdAt: Date.now() };
+          return buffer;
+        })
+        .finally(() => {
+          if (this.snapshotPromise === request) {
+            this.snapshotPromise = undefined;
+          }
+        });
+      this.snapshotPromise = request;
+    } else {
+      this.camera.log.debug('Reusing in-flight snapshot request.');
+    }
+
+    return this.snapshotPromise;
+  }
+
+  private async getSnapshot(forceRefresh = false): Promise<Buffer> {
+    if (!forceRefresh) {
+      const freshSnapshot = this.cachedSnapshot(TuyaStreamingDelegate.SNAPSHOT_CACHE_MAX_AGE);
+      if (freshSnapshot) {
+        this.camera.log.debug('Serving cached snapshot.');
+        return freshSnapshot;
+      }
+
+      const staleSnapshot = this.cachedSnapshot(TuyaStreamingDelegate.SNAPSHOT_STALE_MAX_AGE);
+      if (staleSnapshot) {
+        this.camera.log.debug('Serving the last cached frame while refreshing it in the background.');
+        void this.snapshotRequest()
+          .catch(error => this.camera.log.warn(`Background snapshot refresh failed: ${error}`));
+        return staleSnapshot;
+      }
+    }
+
+    try {
+      return await this.snapshotRequest();
+    } catch (error) {
+      const staleSnapshot = this.cachedSnapshot(TuyaStreamingDelegate.SNAPSHOT_STALE_MAX_AGE);
+      if (staleSnapshot) {
+        this.camera.log.warn('Snapshot refresh failed; serving the last cached frame.');
+        return staleSnapshot;
+      }
+      throw error;
+    }
   }
 
   private async fetchSnapshot(): Promise<Buffer> {
@@ -437,9 +540,8 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
       throw new Error('Device is currently offline.');
     }
 
-    // TODO: Check if there is a stream already running to fetch snapshot.
-
-    const rtspUrl = await this.retrieveDeviceRTSP();
+    const startedAt = Date.now();
+    const rtspUrl = await this.retrieveDeviceRTSP('snapshot');
 
     const ffmpegArgs = [
       '-i', rtspUrl,
@@ -454,7 +556,7 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
 
     return new Promise((resolve, reject) => {
 
-      this.camera.log.debug(`Running Snapshot command: ${defaultFfmpegPath} ${ffmpegArgs.map(value => JSON.stringify(value)).join(' ')}`);
+      this.camera.log.debug('Starting snapshot FFmpeg process.');
 
       const ffmpeg = spawn(
         defaultFfmpegPath,
@@ -465,14 +567,34 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
       let errors: string[] = [];
 
       let snapshotBuffer = Buffer.alloc(0);
+      let settled = false;
+
+      const finish = (error?: Error) => {
+        if (settled) {
+          return;
+        }
+        settled = true;
+        clearTimeout(timeout);
+        if (error) {
+          reject(error);
+        } else {
+          const elapsed = (Date.now() - startedAt) / 1000;
+          this.camera.log.debug(`Snapshot captured in ${elapsed.toFixed(3)} seconds.`);
+          resolve(snapshotBuffer);
+        }
+      };
+
+      const timeout = setTimeout(() => {
+        ffmpeg.kill('SIGKILL');
+        finish(new Error('Snapshot timed out waiting for a video frame.'));
+      }, TuyaStreamingDelegate.SNAPSHOT_TIMEOUT);
 
       ffmpeg.stdout.on('data', (data) => {
         snapshotBuffer = Buffer.concat([snapshotBuffer, data]);
       });
 
       ffmpeg.on('error', (error) => {
-        this.camera.log.error(`FFmpeg process creation failed: ${error.message} - Showing "offline" image instead.`);
-        reject('Failed to fetch snapshot.');
+        finish(new Error(`FFmpeg snapshot process failed: ${error.message}`));
       });
 
       ffmpeg.stderr.on('data', (data) => {
@@ -482,15 +604,12 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
 
       ffmpeg.on('close', () => {
         if (snapshotBuffer.length > 0) {
-          resolve(snapshotBuffer);
+          finish();
         } else {
-          this.camera.log.error('Failed to fetch snapshot. Showing "offline" image instead.');
-
           if (errors.length > 0) {
-            this.camera.log.error(errors.join(' - '));
+            this.camera.log.debug(errors.join(' - '));
           }
-
-          reject('Unable to fetch snapshot.');
+          finish(new Error('Snapshot source closed before returning a video frame.'));
         }
       });
     });

@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.7.0-videolock.3] - 2026-07-22
+
+### Changed
+- Preallocate the Tuya RTSP source during the HomeKit prepare handshake.
+- Cache snapshots for 30 seconds and serve a recent frame while refreshing it in the background.
+- Deduplicate simultaneous snapshot requests and enforce a 12-second FFmpeg timeout.
+- Prewarm the camera snapshot before publishing a doorbell event to HomeKit.
+- Advertise 15 fps camera profiles to reduce transcoding load on low-power Homebridge hosts.
+- Log Tuya allocation, snapshot, and total first-frame timings separately.
+
+### Fixed
+- Return immediately when HomeKit starts an unknown stream session.
+- Build runtime artifacts without unnecessary TypeScript declaration output.
+
 ## [1.7.0] - (unreleased)
 
 ### Added
