@@ -1,5 +1,9 @@
 import { describe, expect, jest, test } from '@jest/globals';
-import { resolveCameraMaxFPS, TuyaStreamingDelegate } from '../src/util/TuyaStreamDelegate';
+import {
+  resolveCameraMaxFPS,
+  SNAPSHOT_TIMEOUT_MS,
+  TuyaStreamingDelegate,
+} from '../src/util/TuyaStreamDelegate';
 
 describe('resolveCameraMaxFPS', () => {
   test.each([
@@ -11,6 +15,12 @@ describe('resolveCameraMaxFPS', () => {
   ])('resolves %p to %i fps', (configured, expected) => {
     expect(resolveCameraMaxFPS(configured)).toBe(expected);
   });
+});
+
+test('allows enough time for a slow Tuya VideoLock first frame', () => {
+  expect(SNAPSHOT_TIMEOUT_MS).toBe(15_000);
+  expect(SNAPSHOT_TIMEOUT_MS).toBeGreaterThan(11_300);
+  expect(SNAPSHOT_TIMEOUT_MS).toBeLessThan(25_000);
 });
 
 function createDelegate() {

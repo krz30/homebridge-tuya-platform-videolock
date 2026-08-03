@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.0-videolock.7] - 2026-08-03
+
+### Fixed
+- Increase the snapshot FFmpeg timeout from 7s to 15s. Real VideoLock first-frame latency was measured at 7.5–11.3s, so the previous timeout aborted valid captures and left Apple Home displaying its last successful preview.
+- Keep snapshots uncached: every HomeKit request still asks Tuya for a current frame.
+
 ## [1.7.0-videolock.6] - 2026-07-22
 
 ### Changed

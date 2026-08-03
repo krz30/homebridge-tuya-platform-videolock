@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable max-len */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TuyaStreamingDelegate = void 0;
+exports.TuyaStreamingDelegate = exports.SNAPSHOT_TIMEOUT_MS = void 0;
 exports.resolveCameraMaxFPS = resolveCameraMaxFPS;
 const camera_utils_1 = require("@homebridge/camera-utils");
 const child_process_1 = require("child_process");
@@ -11,6 +11,10 @@ const FfmpegStreamingProcess_1 = require("./FfmpegStreamingProcess");
 function resolveCameraMaxFPS(value) {
     return value === 30 ? 30 : 15;
 }
+// Tuya VideoLock devices may need more than 7 seconds to wake and emit their
+// first RTSP frame. HAP-NodeJS warns at 8 seconds but keeps the request alive
+// for roughly 25 seconds, so this remains inside its hard deadline.
+exports.SNAPSHOT_TIMEOUT_MS = 15 * 1000;
 /*
 interface SampleRateEntry {
     type: AudioRecordingCodecType;
@@ -24,7 +28,6 @@ class TuyaStreamingDelegate {
     pendingSessions = {};
     ongoingSessions = {};
     snapshotPromise;
-    static SNAPSHOT_TIMEOUT = 7 * 1000;
     camera;
     hap;
     constructor(camera) {
@@ -366,7 +369,7 @@ class TuyaStreamingDelegate {
             const timeout = setTimeout(() => {
                 ffmpeg.kill('SIGKILL');
                 finish(new Error('Snapshot timed out waiting for a video frame.'));
-            }, TuyaStreamingDelegate.SNAPSHOT_TIMEOUT);
+            }, exports.SNAPSHOT_TIMEOUT_MS);
             ffmpeg.stdout.on('data', (data) => {
                 snapshotBuffer = Buffer.concat([snapshotBuffer, data]);
             });

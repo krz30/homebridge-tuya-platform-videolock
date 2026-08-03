@@ -44,6 +44,11 @@ export function resolveCameraMaxFPS(value: unknown): 15 | 30 {
   return value === 30 ? 30 : 15;
 }
 
+// Tuya VideoLock devices may need more than 7 seconds to wake and emit their
+// first RTSP frame. HAP-NodeJS warns at 8 seconds but keeps the request alive
+// for roughly 25 seconds, so this remains inside its hard deadline.
+export const SNAPSHOT_TIMEOUT_MS = 15 * 1000;
+
 interface SessionInfo {
     address: string; // address of the HAP controller
     addressVersion: 'ipv4' | 'ipv6';
@@ -87,8 +92,6 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
   private ongoingSessions: { [index: string]: ActiveSession } = {};
 
   private snapshotPromise?: Promise<Buffer>;
-
-  private static readonly SNAPSHOT_TIMEOUT = 7 * 1000;
 
   private readonly camera: BaseAccessory;
   private readonly hap: HAP;
@@ -539,7 +542,7 @@ export class TuyaStreamingDelegate implements CameraStreamingDelegate, FfmpegStr
       const timeout = setTimeout(() => {
         ffmpeg.kill('SIGKILL');
         finish(new Error('Snapshot timed out waiting for a video frame.'));
-      }, TuyaStreamingDelegate.SNAPSHOT_TIMEOUT);
+      }, SNAPSHOT_TIMEOUT_MS);
 
       ffmpeg.stdout.on('data', (data) => {
         snapshotBuffer = Buffer.concat([snapshotBuffer, data]);
