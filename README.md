@@ -44,7 +44,7 @@ Example pinned to the previous known-good build (`1.7.0-videolock.7`, commit `81
 npm install github:krz30/homebridge-tuya-platform-videolock#811335a
 ```
 
-The development build is version `1.7.0-videolock.15`. Pin its Git commit after publication and installation so production cannot move unexpectedly.
+The development build is version `1.7.0-videolock.16`. Pin its Git commit after publication and installation so production cannot move unexpectedly.
 
 ### Quick start
 
@@ -125,7 +125,7 @@ Ejemplo fijado a la compilación buena anterior (`1.7.0-videolock.7`, commit `81
 npm install github:krz30/homebridge-tuya-platform-videolock#811335a
 ```
 
-La compilación en desarrollo corresponde a `1.7.0-videolock.15`. Después de publicarla e instalarla, fija su commit de Git para evitar cambios inesperados. Crea el proyecto Tuya, autoriza las APIs, instala solo este fork, configura Homebridge localmente y reinicia. Consulta [Configuración](docs/CONFIGURATION.md) para los detalles.
+La compilación en desarrollo corresponde a `1.7.0-videolock.16`. Después de publicarla e instalarla, fija su commit de Git para evitar cambios inesperados. Crea el proyecto Tuya, autoriza las APIs, instala solo este fork, configura Homebridge localmente y reinicia. Consulta [Configuración](docs/CONFIGURATION.md) para los detalles.
 
 ## License / Licencia
 

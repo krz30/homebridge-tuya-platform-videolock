@@ -18,7 +18,7 @@ describe('VideoLockAccessory', () => {
     AccessoryInformation: 'AccessoryInformation',
     Battery: 'Battery',
     LockMechanism: 'LockMechanism',
-    ContactSensor: 'ContactSensor',
+    ContactSensor: Object.assign(jest.fn(), { UUID: 'ContactSensor' }),
     MotionSensor: 'MotionSensor',
     Doorbell: 'Doorbell',
   };
@@ -90,6 +90,7 @@ describe('VideoLockAccessory', () => {
         const characteristics = new Map<any, any>();
         const service: any = {
           type: serviceType,
+          UUID: (serviceType as any).UUID || serviceType,
           name,
           subtype,
           characteristics: [],
@@ -149,13 +150,19 @@ describe('VideoLockAccessory', () => {
     const device = mockDeviceManager.getDevice();
     device.schema[0].code = 'lock_motor_state';
     device.status[0].code = 'lock_motor_state';
+    const openEventContact = mockAccessory.addService(
+      serviceTypes.ContactSensor,
+      'Test Video Lock Door Opened',
+      'door-open-event',
+    );
     const redundantContact = mockAccessory.addService(serviceTypes.ContactSensor);
 
     const videoLock = new VideoLockAccessory(mockPlatform, mockAccessory);
     videoLock.configureServices();
 
     expect(mockAccessory.removeService).toHaveBeenCalledWith(redundantContact);
-    expect(mockAccessory.getService(serviceTypes.ContactSensor)).toBeUndefined();
+    expect(mockAccessory.services).toContain(openEventContact);
+    expect(mockAccessory.services).not.toContain(redundantContact);
   });
 
   test('pulses a dedicated contact when the door is opened without changing the lock state', async () => {

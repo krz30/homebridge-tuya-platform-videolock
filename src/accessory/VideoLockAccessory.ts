@@ -95,8 +95,9 @@ export default class VideoLockAccessory extends BaseAccessory {
   configureDoorContactState() {
     const schema = this.getSchema(...SCHEMA_CODE.DOOR_CONTACT_STATE);
     if (!schema) {
-      const redundantLockContact = this.accessory.getService(this.Service.ContactSensor);
-      if (redundantLockContact && redundantLockContact.subtype !== 'door-open-event') {
+      const redundantLockContact = this.accessory.services.find(service =>
+        service.UUID === this.Service.ContactSensor.UUID && service.subtype !== 'door-open-event');
+      if (redundantLockContact) {
         this.accessory.removeService(redundantLockContact);
       }
       return;

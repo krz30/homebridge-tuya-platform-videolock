@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.7.0-videolock.16] - 2026-08-13
+
+### Fixed
+- Find the redundant cached Contact Sensor by service UUID and subtype instead of relying on `getService()` ordering, which can return the retained `Door Opened` contact first.
+
 ## [1.7.0-videolock.15] - 2026-08-13
 
 ### Fixed
