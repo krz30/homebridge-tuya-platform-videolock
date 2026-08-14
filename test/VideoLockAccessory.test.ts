@@ -135,7 +135,7 @@ describe('VideoLockAccessory', () => {
       .toHaveBeenCalledWith(characteristicTypes.ContactSensorState.CONTACT_NOT_DETECTED);
   });
 
-  test('does not treat lock_motor_state as a door contact', () => {
+  test('uses lock_motor_state as a contact sensor fallback', () => {
     const device = mockDeviceManager.getDevice();
     device.schema[0].code = 'lock_motor_state';
     device.status[0].code = 'lock_motor_state';
@@ -143,6 +143,12 @@ describe('VideoLockAccessory', () => {
     const videoLock = new VideoLockAccessory(mockPlatform, mockAccessory);
     videoLock.configureServices();
 
-    expect(mockAccessory.getService(serviceTypes.ContactSensor)).toBeUndefined();
+    const contactService = mockAccessory.getService(serviceTypes.ContactSensor);
+    const contactState = contactService.getCharacteristic(characteristicTypes.ContactSensorState);
+    const getContactState = contactState.onGet.mock.calls[0][0];
+    expect(getContactState()).toBe(characteristicTypes.ContactSensorState.CONTACT_DETECTED);
+
+    device.status[0].value = true;
+    expect(getContactState()).toBe(characteristicTypes.ContactSensorState.CONTACT_NOT_DETECTED);
   });
 });

@@ -1,10 +1,15 @@
 # Changelog
 
+## [1.7.0-videolock.9] - 2026-08-13
+
+### Fixed
+- Fall back to `lock_motor_state` for the HomeKit Contact Sensor when a VideoLock does not expose `open_close` or `closed_opened`. Tuya defines `true` as unlocked/open and `false` as locked/closed for this DP.
+
 ## [1.7.0-videolock.8] - 2026-08-13
 
 ### Added
 - Expose the VideoLock door state as a HomeKit Contact Sensor when Tuya provides `open_close` or `closed_opened`, enabling Home notifications when the door opens or closes.
-- Do not infer physical door state from `lock_motor_state`; devices that expose only the lock motor continue without a Contact Sensor.
+- Prefer physical door-state DPs over the lock motor when they are available.
 
 ## [1.7.0-videolock.7] - 2026-08-03
 
