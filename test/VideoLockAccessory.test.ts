@@ -183,4 +183,32 @@ describe('VideoLockAccessory', () => {
     expect(motionDetected.updateValue).toHaveBeenCalledWith(false);
     jest.useRealTimers();
   });
+
+  test('pulses on repeated fingerprint unlock records while the lock remains open', async () => {
+    jest.useFakeTimers();
+    const device = mockDeviceManager.getDevice();
+    device.status[0].value = true;
+    device.schema.push({
+      code: 'unlock_fingerprint',
+      mode: TuyaDeviceSchemaMode.READ_ONLY,
+      type: TuyaDeviceSchemaType.Integer,
+      property: { min: 0, max: 999, scale: 0, step: 1, unit: '' },
+    });
+    device.status.push({ code: 'unlock_fingerprint', value: 1 });
+
+    const videoLock = new VideoLockAccessory(mockPlatform, mockAccessory);
+    videoLock.configureServices();
+    videoLock.intialized = true;
+
+    const motionService = mockAccessory.getServiceById(serviceTypes.MotionSensor, 'door-open-event');
+    const motionDetected = motionService.getCharacteristic(characteristicTypes.MotionDetected);
+
+    await videoLock.onDeviceStatusUpdate([{ code: 'unlock_fingerprint', value: 1 }]);
+    jest.advanceTimersByTime(3 * 1000);
+    await videoLock.onDeviceStatusUpdate([{ code: 'unlock_fingerprint', value: 1 }]);
+
+    expect(motionDetected.updateValue.mock.calls.filter(call => call[0] === true)).toHaveLength(2);
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+  });
 });

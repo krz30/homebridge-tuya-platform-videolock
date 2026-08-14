@@ -10,7 +10,27 @@ const SCHEMA_CODE = {
   LOCK_CURRENT_STATE: ['open_close', 'closed_opened', 'lock_motor_state'],
   LOCK_TARGET_STATE: ['lock_motor_state'],
   DOOR_CONTACT_STATE: ['open_close', 'closed_opened', 'lock_motor_state'],
-  DOOR_OPEN_EVENT: ['door_opened', 'open_inside'],
+  DOOR_OPEN_EVENT: [
+    'door_opened',
+    'open_inside',
+    'unlock_fingerprint',
+    'unlock_password',
+    'unlock_temporary',
+    'unlock_dynamic',
+    'unlock_card',
+    'unlock_face',
+    'unlock_hand',
+    'unlock_phone_remote',
+    'unlock_key',
+    'unlock_app',
+    'unlock_remote',
+    'unlock_voice_remote',
+    'unlock_eye',
+    'unlock_finger_vein',
+    'unlock_ble',
+    'unlock_special',
+    'unlock_access_control',
+  ],
   DOORBELL_RING: ['doorbell', 'doorbell_call'],
 };
 
@@ -90,8 +110,10 @@ export default class VideoLockAccessory extends BaseAccessory {
   }
 
   configureDoorOpenEvent() {
-    const schema = this.getSchema(...SCHEMA_CODE.DOOR_OPEN_EVENT);
-    if (!schema) {
+    const schemas = SCHEMA_CODE.DOOR_OPEN_EVENT
+      .map(code => this.getSchema(code))
+      .filter(schema => schema !== undefined);
+    if (schemas.length === 0) {
       return;
     }
 
@@ -135,10 +157,11 @@ export default class VideoLockAccessory extends BaseAccessory {
   async onDeviceStatusUpdate(status: TuyaDeviceStatus[]) {
     super.onDeviceStatusUpdate(status);
 
-    const doorOpenSchema = this.getSchema(...SCHEMA_CODE.DOOR_OPEN_EVENT);
-    if (doorOpenSchema) {
-      const doorOpenStatus = status.find(_status => _status.code === doorOpenSchema.code);
-      if (doorOpenStatus?.value === true && this.intialized) {
+    const doorOpenStatus = status.find(_status =>
+      SCHEMA_CODE.DOOR_OPEN_EVENT.includes(_status.code) && this.getSchema(_status.code));
+    if (doorOpenStatus) {
+      const isEvent = typeof doorOpenStatus.value !== 'boolean' || doorOpenStatus.value === true;
+      if (isEvent && this.intialized) {
         this.log.info('Door opening detected.');
         const characteristic = this.getDoorOpenEventService()
           .getCharacteristic(this.Characteristic.MotionDetected);

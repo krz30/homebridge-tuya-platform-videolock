@@ -14,7 +14,7 @@ npm test -- --runInBand test/Config.test.ts test/TuyaStreamDelegate.test.ts test
 npm pack --dry-run --json
 ```
 
-The focused command currently covers 46 tests across five suites and does not require a live Homebridge development profile. `test/custom.test.ts` and `test/home.test.ts` are integration-style suites that expect `~/.homebridge-dev/config.json`; do not claim a clean full suite unless that local fixture exists and the run succeeds.
+The focused command currently covers 47 tests across five suites and does not require a live Homebridge development profile. `test/custom.test.ts` and `test/home.test.ts` are integration-style suites that expect `~/.homebridge-dev/config.json`; do not claim a clean full suite unless that local fixture exists and the run succeeds.
 
 ### Writing tests
 

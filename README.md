@@ -16,7 +16,7 @@ AI maintainers: start with [`AGENTS.md`](AGENTS.md). Claude also discovers [`CLA
 - A `VideoLockAccessory` for Tuya category `videolock`.
 - `LockMechanism`, door contact sensor, `Doorbell`, and `CameraController` on the same HomeKit accessory.
 - Door-open and door-close notifications through the contact sensor, preferring `open_close` or `closed_opened` and falling back to `lock_motor_state`.
-- Opening-event notifications from `door_opened` or `open_inside`, exposed as a short HomeKit motion event when the handle opens an already-unlocked door.
+- Opening-event notifications from `door_opened`, `open_inside`, or Tuya unlock records, exposed as a short HomeKit motion event even when the lock was already unlocked.
 - Doorbell notifications from Tuya `doorbell` or `doorbell_call` data points.
 - Tuya RTSP allocation during HomeKit's prepare handshake to reduce startup delay.
 - Live H.264 video transcoded by FFmpeg to HomeKit SRTP with a selectable 15 or 30 fps profile (15 by default).
@@ -44,7 +44,7 @@ Example pinned to the previous known-good build (`1.7.0-videolock.7`, commit `81
 npm install github:krz30/homebridge-tuya-platform-videolock#811335a
 ```
 
-The development build is version `1.7.0-videolock.11`. Pin its Git commit after publication and installation so production cannot move unexpectedly.
+The development build is version `1.7.0-videolock.12`. Pin its Git commit after publication and installation so production cannot move unexpectedly.
 
 ### Quick start
 
@@ -97,7 +97,7 @@ These placeholders are literal; Homebridge JSON does not expand environment vari
 - Un `VideoLockAccessory` para la categoría Tuya `videolock`.
 - `LockMechanism`, sensor de contacto de puerta, `Doorbell` y `CameraController` en un solo accesorio de HomeKit.
 - Notificaciones al abrir y cerrar mediante el sensor de contacto, usando primero `open_close` o `closed_opened` y recurriendo a `lock_motor_state` cuando no existen.
-- Notificaciones del evento `door_opened` u `open_inside` mediante un pulso corto de movimiento cuando se abre con la manija una puerta que ya estaba sin candado.
+- Notificaciones mediante un pulso corto de movimiento desde `door_opened`, `open_inside` o los registros de desbloqueo Tuya, incluso si la puerta ya estaba sin candado.
 - Notificaciones del timbre mediante los data points `doorbell` o `doorbell_call`.
 - Reserva del RTSP de Tuya durante la preparación de HomeKit para reducir la espera inicial.
 - Video H.264 convertido por FFmpeg a SRTP de HomeKit, seleccionable entre 15 o 30 fps (15 por defecto).
@@ -125,7 +125,7 @@ Ejemplo fijado a la compilación buena anterior (`1.7.0-videolock.7`, commit `81
 npm install github:krz30/homebridge-tuya-platform-videolock#811335a
 ```
 
-La compilación en desarrollo corresponde a `1.7.0-videolock.11`. Después de publicarla e instalarla, fija su commit de Git para evitar cambios inesperados. Crea el proyecto Tuya, autoriza las APIs, instala solo este fork, configura Homebridge localmente y reinicia. Consulta [Configuración](docs/CONFIGURATION.md) para los detalles.
+La compilación en desarrollo corresponde a `1.7.0-videolock.12`. Después de publicarla e instalarla, fija su commit de Git para evitar cambios inesperados. Crea el proyecto Tuya, autoriza las APIs, instala solo este fork, configura Homebridge localmente y reinicia. Consulta [Configuración](docs/CONFIGURATION.md) para los detalles.
 
 ## License / Licencia
 

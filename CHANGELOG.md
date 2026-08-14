@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.0-videolock.12] - 2026-08-13
+
+### Fixed
+- Trigger the door-opening motion event from Tuya unlock records such as `unlock_fingerprint`, even when `lock_motor_state` was already unlocked and `open_inside` remains latched at `true`.
+- Support the equivalent password, card, face, palm, key, app, remote, iris, finger-vein, BLE, and access-control unlock record codes.
+
 ## [1.7.0-videolock.11] - 2026-08-13
 
 ### Fixed
