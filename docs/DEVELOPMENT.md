@@ -7,13 +7,13 @@ AI or human maintainers should begin with [`AGENTS.md`](../AGENTS.md); Claude-sp
 
 ### Current project state
 
-- Development version: `1.7.0-videolock.9`.
+- Development version: `1.7.0-videolock.10`.
 - Previous known-good `.7` rollback commit: `811335a`.
 - `videolock` routes to `VideoLockAccessory` in `AccessoryFactory`.
 - Door-open/close contact notifications, doorbell notifications, lock services, current snapshots, and live video are implemented.
 - RTSP allocation begins during `prepareStream`; profiles use the configured 15 or 30 fps maximum, with 15 as the default.
 - Snapshot timeout is 15 seconds, allowing the measured 7.5–11.3-second VideoLock first-frame delay to complete within HAP-NodeJS's hard deadline. FFmpeg remains tuned (`-rtsp_transport tcp -analyzeduration 0 -probesize 32000 -fflags nobuffer+discardcorrupt`) for a faster first frame. Only concurrent snapshots are shared; persistent caching and doorbell prewarming remain disabled.
-- Motion-triggered capture, motion service, HKSV recording, and two-way audio are not implemented.
+- Motion-triggered capture, HKSV recording, and two-way audio are not implemented. The motion service is only a short door-opening event.
 
 ### Local-only build policy
 
@@ -60,6 +60,6 @@ npm ci
 
 ### Estado y cómo retomarlo
 
-La versión en desarrollo es `.9`. Funciona cerradura + sensor de contacto con notificaciones al abrir/cerrar + timbre + cámara, la reserva RTSP se adelanta a `prepareStream`, se puede seleccionar 15 o 30 fps y no se conserva caché de previews. El snapshot puede esperar hasta 15 segundos para cubrir la latencia real de despertar de la cámara. No existen todavía sensor/captura por movimiento, HKSV ni audio bidireccional.
+La versión en desarrollo es `.10`. Funciona cerradura + sensor de contacto + evento de apertura interior + timbre + cámara, la reserva RTSP se adelanta a `prepareStream`, se puede seleccionar 15 o 30 fps y no se conserva caché de previews. El snapshot puede esperar hasta 15 segundos para cubrir la latencia real de despertar de la cámara. No existen todavía captura por movimiento, HKSV ni audio bidireccional.
 
 Todo el desarrollo, compilación, empaquetado y backup debe hacerse localmente. En el NAS solo se instala el commit preparado y se realizan pruebas normales. Para continuar, modifica las rutas indicadas, añade tests, ejecuta lint/build/pruebas, fuerza el staging de `dist`, inspecciona seguridad y despliega un commit fijo. Nunca subas configuración, credenciales, inventarios de dispositivos, logs privados ni backups.

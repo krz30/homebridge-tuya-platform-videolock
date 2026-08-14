@@ -10,12 +10,14 @@ const SCHEMA_CODE = {
   LOCK_CURRENT_STATE: ['open_close', 'closed_opened', 'lock_motor_state'],
   LOCK_TARGET_STATE: ['lock_motor_state'],
   DOOR_CONTACT_STATE: ['open_close', 'closed_opened', 'lock_motor_state'],
+  DOOR_OPEN_EVENT: ['door_opened', 'open_inside'],
   DOORBELL_RING: ['doorbell', 'doorbell_call'],
 };
 
 export default class VideoLockAccessory extends BaseAccessory {
 
   private stream: TuyaStreamingDelegate | undefined;
+  private doorOpenTimer?: NodeJS.Timeout;
 
   requiredSchema() {
     return [SCHEMA_CODE.LOCK_CURRENT_STATE];
@@ -25,6 +27,7 @@ export default class VideoLockAccessory extends BaseAccessory {
     this.configureLockCurrentState();
     this.configureLockTargetState();
     this.configureDoorContactState();
+    this.configureDoorOpenEvent();
     this.configureDoorbell();
     this.configureCamera();
   }
@@ -86,6 +89,25 @@ export default class VideoLockAccessory extends BaseAccessory {
       });
   }
 
+  configureDoorOpenEvent() {
+    const schema = this.getSchema(...SCHEMA_CODE.DOOR_OPEN_EVENT);
+    if (!schema) {
+      return;
+    }
+
+    this.getDoorOpenEventService()
+      .setCharacteristic(this.Characteristic.MotionDetected, false);
+  }
+
+  getDoorOpenEventService() {
+    return this.accessory.getServiceById(this.Service.MotionSensor, 'door-open-event')
+      || this.accessory.addService(
+        this.Service.MotionSensor,
+        `${this.device.name} Door Opened`,
+        'door-open-event',
+      );
+  }
+
   configureDoorbell() {
     const schema = this.getSchema(...SCHEMA_CODE.DOORBELL_RING);
     if (!schema) {
@@ -112,6 +134,20 @@ export default class VideoLockAccessory extends BaseAccessory {
 
   async onDeviceStatusUpdate(status: TuyaDeviceStatus[]) {
     super.onDeviceStatusUpdate(status);
+
+    const doorOpenSchema = this.getSchema(...SCHEMA_CODE.DOOR_OPEN_EVENT);
+    if (doorOpenSchema) {
+      const doorOpenStatus = status.find(_status => _status.code === doorOpenSchema.code);
+      if (doorOpenStatus?.value === true && this.intialized) {
+        this.log.info('Door opening detected.');
+        const characteristic = this.getDoorOpenEventService()
+          .getCharacteristic(this.Characteristic.MotionDetected);
+        characteristic.updateValue(true);
+
+        this.doorOpenTimer && clearTimeout(this.doorOpenTimer);
+        this.doorOpenTimer = setTimeout(() => characteristic.updateValue(false), 3 * 1000);
+      }
+    }
 
     const doorbellSchema = this.getSchema(...SCHEMA_CODE.DOORBELL_RING);
     if (!doorbellSchema) {

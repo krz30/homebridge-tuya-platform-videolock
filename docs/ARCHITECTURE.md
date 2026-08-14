@@ -17,6 +17,7 @@ Tuya Cloud API/MQTT ──► TuyaPlatform ──► AccessoryFactory
                                   VideoLockAccessory
                                   ├─ LockMechanism
                                   ├─ ContactSensor
+                                  ├─ MotionSensor (door-open event)
                                   ├─ Doorbell
                                   └─ CameraController
                                             │

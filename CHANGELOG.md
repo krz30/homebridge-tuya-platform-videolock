@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.7.0-videolock.10] - 2026-08-13
+
+### Added
+- Expose `door_opened` or `open_inside` as a three-second HomeKit Motion Sensor event. This reports handle/inside-opening activity even when the door was already unlocked and `lock_motor_state` does not change.
+
 ## [1.7.0-videolock.9] - 2026-08-13
 
 ### Fixed

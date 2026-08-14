@@ -25,7 +25,7 @@ Lee esos archivos en ese orden. Son las fuentes públicas de verdad; no inventes
 - Repository/package: `homebridge-tuya-platform-videolock`.
 - Independent MIT fork of `@0x5e/homebridge-tuya-platform`.
 - Homebridge platform alias: `TuyaPlatform`.
-- Development package version: `1.7.0-videolock.9`.
+- Development package version: `1.7.0-videolock.10`.
 - Previous known-good `.7` runtime rollback commit: `811335a`.
 - Documentation baseline commit: `470892b466dc99b9f7e67481131e807fd1ef32fc`.
 
@@ -39,6 +39,7 @@ Implemented:
 
 - One HomeKit accessory combining `LockMechanism`, a real `Doorbell`, and `CameraController`.
 - A `ContactSensor` preferring `open_close` or `closed_opened` and falling back to `lock_motor_state`, allowing Home notifications when the door opens/unlocks or closes/locks.
+- A three-second `MotionSensor` pulse from `door_opened` or `open_inside`, covering physical opening when the door was already unlocked.
 - Doorbell events from Tuya DP codes `doorbell` or `doorbell_call`.
 - Tuya RTSP allocation begins in HomeKit `prepareStream`.
 - FFmpeg converts cloud RTSP into HomeKit SRTP; `options.cameraMaxFPS` selects 15 or 30 fps, defaulting to 15.
@@ -50,7 +51,7 @@ Not implemented:
 
 - HomeKit Secure Video recording.
 - Two-way audio.
-- Motion sensor exposure or motion-triggered image capture.
+- Motion-triggered image capture; the motion service is only a short door-opening event.
 - Direct LAN video; the source is allocated through Tuya Cloud.
 
 The persistent preview cache and doorbell snapshot prewarming were intentionally removed because they caused stale previews or competing stream work. Do not restore them without a new design, tests, and explicit user approval.
@@ -85,7 +86,7 @@ npm pack --dry-run --json
 git add -f dist
 ```
 
-The focused command is the known credential-free baseline: 5 suites and 45 tests. `test/custom.test.ts` and `test/home.test.ts` require a private local `~/.homebridge-dev/config.json`; do not claim the full suite passes unless that fixture exists and the run actually succeeds.
+The focused command is the known credential-free baseline: 5 suites and 46 tests. `test/custom.test.ts` and `test/home.test.ts` require a private local `~/.homebridge-dev/config.json`; do not claim the full suite passes unless that fixture exists and the run actually succeeds.
 
 After editing:
 

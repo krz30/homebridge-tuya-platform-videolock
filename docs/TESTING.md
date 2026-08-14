@@ -14,7 +14,7 @@ npm test -- --runInBand test/Config.test.ts test/TuyaStreamDelegate.test.ts test
 npm pack --dry-run --json
 ```
 
-The focused command currently covers 45 tests across five suites and does not require a live Homebridge development profile. `test/custom.test.ts` and `test/home.test.ts` are integration-style suites that expect `~/.homebridge-dev/config.json`; do not claim a clean full suite unless that local fixture exists and the run succeeds.
+The focused command currently covers 46 tests across five suites and does not require a live Homebridge development profile. `test/custom.test.ts` and `test/home.test.ts` are integration-style suites that expect `~/.homebridge-dev/config.json`; do not claim a clean full suite unless that local fixture exists and the run succeeds.
 
 ### Writing tests
 
@@ -27,11 +27,12 @@ No minimum coverage threshold is configured. `.github/workflows/build.yml` runs 
 ### Manual VideoLock acceptance
 
 1. Confirm one HomeKit accessory exposes lock, contact sensor, doorbell, microphone, and camera-management services.
-2. Open and close the physical door and verify the contact state and both configured Home notifications.
-3. Ring the physical doorbell and verify the Home notification.
-4. Open live video twice and check startup timing/log errors.
-5. Request a preview after lighting changes and confirm it is fresh.
-6. Lock/unlock and verify current and target states.
+2. Open and close the locked door and verify the contact state and both configured Home notifications.
+3. Leave the door unlocked, open it with the handle, and verify the door-open motion event and Home notification.
+4. Ring the physical doorbell and verify the Home notification.
+5. Open live video twice and check startup timing/log errors.
+6. Request a preview after lighting changes and confirm it is fresh.
+7. Lock/unlock and verify current and target states.
 
 ## Español
 

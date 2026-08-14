@@ -19,6 +19,7 @@ describe('VideoLockAccessory', () => {
     Battery: 'Battery',
     LockMechanism: 'LockMechanism',
     ContactSensor: 'ContactSensor',
+    MotionSensor: 'MotionSensor',
     Doorbell: 'Doorbell',
   };
 
@@ -31,6 +32,7 @@ describe('VideoLockAccessory', () => {
     LockCurrentState: { UNSECURED: 0, SECURED: 1 },
     LockTargetState: { UNSECURED: 0, SECURED: 1 },
     ContactSensorState: { CONTACT_DETECTED: 0, CONTACT_NOT_DETECTED: 1 },
+    MotionDetected: 'MotionDetected',
     ProgrammableSwitchEvent: 'ProgrammableSwitchEvent',
   };
 
@@ -82,10 +84,14 @@ describe('VideoLockAccessory', () => {
       services: [],
       getService: jest.fn((serviceType: string) =>
         mockAccessory.services.find((service: any) => service.type === serviceType)),
-      addService: jest.fn((serviceType: string) => {
+      getServiceById: jest.fn((serviceType: string, subtype: string) =>
+        mockAccessory.services.find((service: any) => service.type === serviceType && service.subtype === subtype)),
+      addService: jest.fn((serviceType: string, name?: string, subtype?: string) => {
         const characteristics = new Map<any, any>();
         const service: any = {
           type: serviceType,
+          name,
+          subtype,
           characteristics: [],
           getCharacteristic: jest.fn((characteristicType: any) => {
             if (!characteristics.has(characteristicType)) {
@@ -150,5 +156,31 @@ describe('VideoLockAccessory', () => {
 
     device.status[0].value = true;
     expect(getContactState()).toBe(characteristicTypes.ContactSensorState.CONTACT_NOT_DETECTED);
+  });
+
+  test('pulses a motion sensor when the door is opened without changing the lock state', async () => {
+    jest.useFakeTimers();
+    const device = mockDeviceManager.getDevice();
+    device.schema.push({
+      code: 'open_inside',
+      mode: TuyaDeviceSchemaMode.READ_ONLY,
+      type: TuyaDeviceSchemaType.Boolean,
+      property: {},
+    });
+    device.status.push({ code: 'open_inside', value: false });
+
+    const videoLock = new VideoLockAccessory(mockPlatform, mockAccessory);
+    videoLock.configureServices();
+    videoLock.intialized = true;
+
+    const motionService = mockAccessory.getServiceById(serviceTypes.MotionSensor, 'door-open-event');
+    const motionDetected = motionService.getCharacteristic(characteristicTypes.MotionDetected);
+
+    await videoLock.onDeviceStatusUpdate([{ code: 'open_inside', value: true }]);
+    expect(motionDetected.updateValue).toHaveBeenCalledWith(true);
+
+    jest.advanceTimersByTime(3 * 1000);
+    expect(motionDetected.updateValue).toHaveBeenCalledWith(false);
+    jest.useRealTimers();
   });
 });
