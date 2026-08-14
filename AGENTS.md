@@ -25,8 +25,8 @@ Lee esos archivos en ese orden. Son las fuentes públicas de verdad; no inventes
 - Repository/package: `homebridge-tuya-platform-videolock`.
 - Independent MIT fork of `@0x5e/homebridge-tuya-platform`.
 - Homebridge platform alias: `TuyaPlatform`.
-- Documented package version: `1.7.0-videolock.7`.
-- Previous known-good `.4` runtime rollback commit: `a257de9dbb499f65ca918d3cfe0932898ae5bbe0`.
+- Development package version: `1.7.0-videolock.8`.
+- Previous known-good `.7` runtime rollback commit: `811335a`.
 - Documentation baseline commit: `470892b466dc99b9f7e67481131e807fd1ef32fc`.
 
 Do not confuse the package name with the platform alias. The original plugin and this fork must not run together because both register `TuyaPlatform`.
@@ -38,6 +38,7 @@ The `videolock` category is selected in `src/accessory/AccessoryFactory.ts` and 
 Implemented:
 
 - One HomeKit accessory combining `LockMechanism`, a real `Doorbell`, and `CameraController`.
+- A `ContactSensor` driven by `open_close` or `closed_opened`, allowing Home notifications when the physical door opens or closes.
 - Doorbell events from Tuya DP codes `doorbell` or `doorbell_call`.
 - Tuya RTSP allocation begins in HomeKit `prepareStream`.
 - FFmpeg converts cloud RTSP into HomeKit SRTP; `options.cameraMaxFPS` selects 15 or 30 fps, defaulting to 15.
@@ -79,12 +80,12 @@ For runtime changes:
 npm ci
 npm run lint
 npm run build
-npm test -- --runInBand test/Config.test.ts test/TuyaStreamDelegate.test.ts test/FanAccessory.test.ts test/Light.test.ts
+npm test -- --runInBand test/Config.test.ts test/TuyaStreamDelegate.test.ts test/VideoLockAccessory.test.ts test/FanAccessory.test.ts test/Light.test.ts
 npm pack --dry-run --json
 git add -f dist
 ```
 
-The focused command is the known credential-free baseline: 4 suites and 42 tests. `test/custom.test.ts` and `test/home.test.ts` require a private local `~/.homebridge-dev/config.json`; do not claim the full suite passes unless that fixture exists and the run actually succeeds.
+The focused command is the known credential-free baseline: 5 suites and 45 tests. `test/custom.test.ts` and `test/home.test.ts` require a private local `~/.homebridge-dev/config.json`; do not claim the full suite passes unless that fixture exists and the run actually succeeds.
 
 After editing:
 
@@ -99,7 +100,7 @@ After editing:
 
 | Concern / Área | Source / Fuente | Tests / Pruebas |
 |---|---|---|
-| VideoLock services and doorbell DPs | `src/accessory/VideoLockAccessory.ts` | accessory/manual acceptance |
+| VideoLock lock/contact/doorbell services and DPs | `src/accessory/VideoLockAccessory.ts` | `test/VideoLockAccessory.test.ts`, manual acceptance |
 | Category routing | `src/accessory/AccessoryFactory.ts` | discovery/manual acceptance |
 | RTSP, snapshots, HomeKit streaming | `src/util/TuyaStreamDelegate.ts` | `test/TuyaStreamDelegate.test.ts` |
 | FFmpeg lifecycle and timing | `src/util/FfmpegStreamingProcess.ts` | build plus live-video acceptance |

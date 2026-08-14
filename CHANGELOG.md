@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.0-videolock.8] - 2026-08-13
+
+### Added
+- Expose the VideoLock door state as a HomeKit Contact Sensor when Tuya provides `open_close` or `closed_opened`, enabling Home notifications when the door opens or closes.
+- Do not infer physical door state from `lock_motor_state`; devices that expose only the lock motor continue without a Contact Sensor.
+
 ## [1.7.0-videolock.7] - 2026-08-03
 
 ### Fixed

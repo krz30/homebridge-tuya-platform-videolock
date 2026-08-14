@@ -14,7 +14,8 @@ AI maintainers: start with [`AGENTS.md`](AGENTS.md). Claude also discovers [`CLA
 ### What this fork adds
 
 - A `VideoLockAccessory` for Tuya category `videolock`.
-- `LockMechanism`, `Doorbell`, and `CameraController` on the same HomeKit accessory.
+- `LockMechanism`, door contact sensor, `Doorbell`, and `CameraController` on the same HomeKit accessory.
+- Door-open and door-close notifications through the contact sensor when Tuya exposes `open_close` or `closed_opened`.
 - Doorbell notifications from Tuya `doorbell` or `doorbell_call` data points.
 - Tuya RTSP allocation during HomeKit's prepare handshake to reduce startup delay.
 - Live H.264 video transcoded by FFmpeg to HomeKit SRTP with a selectable 15 or 30 fps profile (15 by default).
@@ -36,13 +37,13 @@ Pin a release or commit so production cannot change unexpectedly:
 npm install github:krz30/homebridge-tuya-platform-videolock#<release-or-commit>
 ```
 
-Example pinned to the currently documented build (`1.7.0-videolock.7`, commit `811335a`):
+Example pinned to the previous known-good build (`1.7.0-videolock.7`, commit `811335a`):
 
 ```bash
 npm install github:krz30/homebridge-tuya-platform-videolock#811335a
 ```
 
-The currently documented build is version `1.7.0-videolock.7`. Pin its Git commit after installation so production cannot move unexpectedly.
+The development build is version `1.7.0-videolock.8`. Pin its Git commit after publication and installation so production cannot move unexpectedly.
 
 ### Quick start
 
@@ -93,7 +94,8 @@ These placeholders are literal; Homebridge JSON does not expand environment vari
 ### Qué agrega este fork
 
 - Un `VideoLockAccessory` para la categoría Tuya `videolock`.
-- `LockMechanism`, `Doorbell` y `CameraController` en un solo accesorio de HomeKit.
+- `LockMechanism`, sensor de contacto de puerta, `Doorbell` y `CameraController` en un solo accesorio de HomeKit.
+- Notificaciones al abrir y cerrar mediante el sensor de contacto cuando Tuya expone `open_close` o `closed_opened`.
 - Notificaciones del timbre mediante los data points `doorbell` o `doorbell_call`.
 - Reserva del RTSP de Tuya durante la preparación de HomeKit para reducir la espera inicial.
 - Video H.264 convertido por FFmpeg a SRTP de HomeKit, seleccionable entre 15 o 30 fps (15 por defecto).
@@ -115,13 +117,13 @@ Instala una versión o commit fijo:
 npm install github:krz30/homebridge-tuya-platform-videolock#<version-o-commit>
 ```
 
-Ejemplo fijado a la compilación documentada actual (`1.7.0-videolock.7`, commit `811335a`):
+Ejemplo fijado a la compilación buena anterior (`1.7.0-videolock.7`, commit `811335a`):
 
 ```bash
 npm install github:krz30/homebridge-tuya-platform-videolock#811335a
 ```
 
-La compilación documentada corresponde a `1.7.0-videolock.7`. Fija su commit de Git después de instalar para evitar cambios inesperados. Crea el proyecto Tuya, autoriza las APIs, instala solo este fork, configura Homebridge localmente y reinicia. Consulta [Configuración](docs/CONFIGURATION.md) para los detalles.
+La compilación en desarrollo corresponde a `1.7.0-videolock.8`. Después de publicarla e instalarla, fija su commit de Git para evitar cambios inesperados. Crea el proyecto Tuya, autoriza las APIs, instala solo este fork, configura Homebridge localmente y reinicia. Consulta [Configuración](docs/CONFIGURATION.md) para los detalles.
 
 ## License / Licencia
 

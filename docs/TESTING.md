@@ -10,11 +10,11 @@ The project uses Jest 29 with `ts-jest`. Install dependencies with `npm ci` befo
 ```bash
 npm run lint
 npm run build
-npm test -- --runInBand test/Config.test.ts test/TuyaStreamDelegate.test.ts test/FanAccessory.test.ts test/Light.test.ts
+npm test -- --runInBand test/Config.test.ts test/TuyaStreamDelegate.test.ts test/VideoLockAccessory.test.ts test/FanAccessory.test.ts test/Light.test.ts
 npm pack --dry-run --json
 ```
 
-The focused command currently covers 42 tests across four suites and does not require a live Homebridge development profile. `test/custom.test.ts` and `test/home.test.ts` are integration-style suites that expect `~/.homebridge-dev/config.json`; do not claim a clean full suite unless that local fixture exists and the run succeeds.
+The focused command currently covers 45 tests across five suites and does not require a live Homebridge development profile. `test/custom.test.ts` and `test/home.test.ts` are integration-style suites that expect `~/.homebridge-dev/config.json`; do not claim a clean full suite unless that local fixture exists and the run succeeds.
 
 ### Writing tests
 
@@ -26,14 +26,15 @@ No minimum coverage threshold is configured. `.github/workflows/build.yml` runs 
 
 ### Manual VideoLock acceptance
 
-1. Confirm one HomeKit accessory exposes lock, doorbell, microphone, and camera-management services.
-2. Ring the physical doorbell and verify the Home notification.
-3. Open live video twice and check startup timing/log errors.
-4. Request a preview after lighting changes and confirm it is fresh.
-5. Lock/unlock and verify current and target states.
+1. Confirm one HomeKit accessory exposes lock, contact sensor, doorbell, microphone, and camera-management services.
+2. Open and close the physical door and verify the contact state and both configured Home notifications.
+3. Ring the physical doorbell and verify the Home notification.
+4. Open live video twice and check startup timing/log errors.
+5. Request a preview after lighting changes and confirm it is fresh.
+6. Lock/unlock and verify current and target states.
 
 ## Español
 
-Jest 29 con `ts-jest` ejecuta las pruebas. Antes de subir, corre lint, build, las tres suites enfocadas y revisa el paquete. Las suites `custom` y `home` requieren un `config.json` de desarrollo local; no deben contarse como aprobadas si ese fixture no existe.
+Jest 29 con `ts-jest` ejecuta las pruebas. Antes de subir, corre lint, build, las cinco suites enfocadas y revisa el paquete. Las suites `custom` y `home` requieren un `config.json` de desarrollo local; no deben contarse como aprobadas si ese fixture no existe.
 
-No hay umbral de cobertura. CI valida Node 22/24, instalación, lint y build, pero todavía no ejecuta Jest. Las pruebas y fixtures nunca deben contener IDs, cuentas, claves ni RTSP reales. La aceptación manual debe verificar servicios, notificación del timbre, video, preview actualizado y estados de cerradura.
+No hay umbral de cobertura. CI valida Node 22/24, instalación, lint y build, pero todavía no ejecuta Jest. Las pruebas y fixtures nunca deben contener IDs, cuentas, claves ni RTSP reales. La aceptación manual debe verificar el sensor y las notificaciones al abrir/cerrar, los servicios, la notificación del timbre, el video, el preview actualizado y los estados de cerradura.

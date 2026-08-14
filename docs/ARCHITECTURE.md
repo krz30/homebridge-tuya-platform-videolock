@@ -16,6 +16,7 @@ Tuya Cloud API/MQTT ──► TuyaPlatform ──► AccessoryFactory
                                             ▼
                                   VideoLockAccessory
                                   ├─ LockMechanism
+                                  ├─ ContactSensor
                                   ├─ Doorbell
                                   └─ CameraController
                                             │
@@ -41,7 +42,7 @@ The Tuya allocation request can be quick while the RTSP source still takes sever
 | `src/core/TuyaOpenAPI.ts` | Signs and sends Tuya Cloud API requests. |
 | `src/core/TuyaOpenMQ.ts` | Receives Tuya device status events through MQTT. |
 | `src/accessory/AccessoryFactory.ts` | Selects the handler for each Tuya category. |
-| `src/accessory/VideoLockAccessory.ts` | Combines lock, doorbell, and camera behavior for `videolock`. |
+| `src/accessory/VideoLockAccessory.ts` | Combines lock, door contact, doorbell, and camera behavior for `videolock`. |
 | `src/util/TuyaStreamDelegate.ts` | Handles HomeKit stream preparation, RTSP allocation, snapshots, and FFmpeg arguments. |
 | `src/util/FfmpegStreamingProcess.ts` | Owns the FFmpeg process, first-frame telemetry, and shutdown behavior. |
 
@@ -61,7 +62,7 @@ docs/                public project documentation
 
 ### Resumen del sistema
 
-La plataforma dinámica descubre dispositivos mediante Tuya Cloud, elige un handler por categoría y traduce estados y comandos a servicios HomeKit. En `videolock`, un solo handler agrupa cerradura, timbre real y cámara.
+La plataforma dinámica descubre dispositivos mediante Tuya Cloud, elige un handler por categoría y traduce estados y comandos a servicios HomeKit. En `videolock`, un solo handler agrupa cerradura, sensor de contacto de puerta, timbre real y cámara.
 
 ### Flujo de video
 
