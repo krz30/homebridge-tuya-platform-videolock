@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.0-videolock.14] - 2026-08-13
+
+### Changed
+- Publish the repeatable door-opening event as a dedicated HomeKit Contact Sensor instead of a Motion Sensor, so Apple Home presents native door activity notification controls.
+- Remove the legacy `door-open-event` Motion Sensor automatically when an existing accessory upgrades.
+
 ## [1.7.0-videolock.13] - 2026-08-13
 
 ### Fixed

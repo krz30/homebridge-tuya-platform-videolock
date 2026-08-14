@@ -131,7 +131,7 @@ Most category code is pinyin abbreviation of Chinese name.
 | Human Motion Sensor | 人体运动传感器 | pir | Motion Sensor | ✅ | [Documentation](https://developer.tuya.com/en/docs/iot/categorypir?id=Kaiuz3ss11b80) |
 | Human Presence Sensor | 人体存在传感器 | hps | Occupancy Sensor | ✅ | [Documentation](https://developer.tuya.com/en/docs/iot/categoryhps?id=Kaiuz42yhn1hs) |
 | Smart Lock | 智能门锁 | ms<br> jtmspro | LockMechanism | ✅ | [Documentation](https://developer.tuya.com/en/docs/iot/ms?id=Kb0o2s20fn9sy) |
-| Video Lock | 视频门锁 | videolock | LockMechanism<br> ContactSensor<br> MotionSensor<br> Doorbell<br> Camera | ✅ | ContactSensor tracks door/lock state; MotionSensor reports door/open-inside and unlock-record events |
+| Video Lock | 视频门锁 | videolock | LockMechanism<br> ContactSensor (state)<br> ContactSensor (open event)<br> Doorbell<br> Camera | ✅ | One contact tracks door/lock state; the dedicated contact reports repeatable opening events |
 | Environmental Detector | 环境检测仪 | hjjcy | Air Quality Sensor | ✅ | [Documentation](https://developer.tuya.com/en/docs/iot/hjjcy?id=Kbeoad8y1nnlv) |
 
 

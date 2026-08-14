@@ -119,6 +119,9 @@ describe('VideoLockAccessory', () => {
         return service;
       }),
       configureController: jest.fn(),
+      removeService: jest.fn((service: any) => {
+        mockAccessory.services.splice(mockAccessory.services.indexOf(service), 1);
+      }),
     } as unknown as PlatformAccessory;
   });
 
@@ -159,7 +162,7 @@ describe('VideoLockAccessory', () => {
     expect(getContactState()).toBe(characteristicTypes.ContactSensorState.CONTACT_NOT_DETECTED);
   });
 
-  test('pulses a motion sensor when the door is opened without changing the lock state', async () => {
+  test('pulses a dedicated contact when the door is opened without changing the lock state', async () => {
     jest.useFakeTimers();
     const device = mockDeviceManager.getDevice();
     device.schema.push({
@@ -174,14 +177,16 @@ describe('VideoLockAccessory', () => {
     videoLock.configureServices();
     videoLock.intialized = true;
 
-    const motionService = mockAccessory.getServiceById(serviceTypes.MotionSensor, 'door-open-event');
-    const motionDetected = motionService.getCharacteristic(characteristicTypes.MotionDetected);
+    const openEventService = mockAccessory.getServiceById(serviceTypes.ContactSensor, 'door-open-event');
+    const openEvent = openEventService.getCharacteristic(characteristicTypes.ContactSensorState);
 
     await videoLock.onDeviceStatusUpdate([{ code: 'open_inside', value: true }]);
-    expect(motionDetected.sendEventNotification).toHaveBeenCalledWith(true);
+    expect(openEvent.sendEventNotification)
+      .toHaveBeenCalledWith(characteristicTypes.ContactSensorState.CONTACT_NOT_DETECTED);
 
     jest.advanceTimersByTime(30 * 1000);
-    expect(motionDetected.updateValue).toHaveBeenCalledWith(false);
+    expect(openEvent.updateValue)
+      .toHaveBeenCalledWith(characteristicTypes.ContactSensorState.CONTACT_DETECTED);
     jest.useRealTimers();
   });
 
@@ -201,15 +206,35 @@ describe('VideoLockAccessory', () => {
     videoLock.configureServices();
     videoLock.intialized = true;
 
-    const motionService = mockAccessory.getServiceById(serviceTypes.MotionSensor, 'door-open-event');
-    const motionDetected = motionService.getCharacteristic(characteristicTypes.MotionDetected);
+    const openEventService = mockAccessory.getServiceById(serviceTypes.ContactSensor, 'door-open-event');
+    const openEvent = openEventService.getCharacteristic(characteristicTypes.ContactSensorState);
 
     await videoLock.onDeviceStatusUpdate([{ code: 'unlock_fingerprint', value: 1 }]);
     jest.advanceTimersByTime(30 * 1000);
     await videoLock.onDeviceStatusUpdate([{ code: 'unlock_fingerprint', value: 1 }]);
 
-    expect(motionDetected.sendEventNotification).toHaveBeenCalledTimes(2);
+    expect(openEvent.sendEventNotification).toHaveBeenCalledTimes(2);
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
+  });
+
+  test('removes the legacy motion event service when upgrading', () => {
+    const legacyMotionService = { type: serviceTypes.MotionSensor, subtype: 'door-open-event' };
+    mockAccessory.services.push(legacyMotionService);
+    const device = mockDeviceManager.getDevice();
+    device.schema.push({
+      code: 'unlock_face',
+      mode: TuyaDeviceSchemaMode.READ_ONLY,
+      type: TuyaDeviceSchemaType.Integer,
+      property: { min: 0, max: 999, scale: 0, step: 1, unit: '' },
+    });
+    device.status.push({ code: 'unlock_face', value: 1 });
+
+    const videoLock = new VideoLockAccessory(mockPlatform, mockAccessory);
+    videoLock.configureServices();
+
+    expect(mockAccessory.removeService).toHaveBeenCalledWith(legacyMotionService);
+    expect(mockAccessory.getServiceById(serviceTypes.MotionSensor, 'door-open-event')).toBeUndefined();
+    expect(mockAccessory.getServiceById(serviceTypes.ContactSensor, 'door-open-event')).toBeDefined();
   });
 });

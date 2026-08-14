@@ -110,6 +110,11 @@ export default class VideoLockAccessory extends BaseAccessory {
   }
 
   configureDoorOpenEvent() {
+    const legacyMotionService = this.accessory.getServiceById(this.Service.MotionSensor, 'door-open-event');
+    if (legacyMotionService) {
+      this.accessory.removeService(legacyMotionService);
+    }
+
     const schemas = SCHEMA_CODE.DOOR_OPEN_EVENT
       .map(code => this.getSchema(code))
       .filter(schema => schema !== undefined);
@@ -118,13 +123,16 @@ export default class VideoLockAccessory extends BaseAccessory {
     }
 
     this.getDoorOpenEventService()
-      .setCharacteristic(this.Characteristic.MotionDetected, false);
+      .setCharacteristic(
+        this.Characteristic.ContactSensorState,
+        this.Characteristic.ContactSensorState.CONTACT_DETECTED,
+      );
   }
 
   getDoorOpenEventService() {
-    return this.accessory.getServiceById(this.Service.MotionSensor, 'door-open-event')
+    return this.accessory.getServiceById(this.Service.ContactSensor, 'door-open-event')
       || this.accessory.addService(
-        this.Service.MotionSensor,
+        this.Service.ContactSensor,
         `${this.device.name} Door Opened`,
         'door-open-event',
       );
@@ -164,11 +172,15 @@ export default class VideoLockAccessory extends BaseAccessory {
       if (isEvent && this.intialized) {
         this.log.info('Door opening detected.');
         const characteristic = this.getDoorOpenEventService()
-          .getCharacteristic(this.Characteristic.MotionDetected);
-        characteristic.sendEventNotification(true);
+          .getCharacteristic(this.Characteristic.ContactSensorState);
+        characteristic.sendEventNotification(
+          this.Characteristic.ContactSensorState.CONTACT_NOT_DETECTED,
+        );
 
         this.doorOpenTimer && clearTimeout(this.doorOpenTimer);
-        this.doorOpenTimer = setTimeout(() => characteristic.updateValue(false), 30 * 1000);
+        this.doorOpenTimer = setTimeout(() => characteristic.updateValue(
+          this.Characteristic.ContactSensorState.CONTACT_DETECTED,
+        ), 30 * 1000);
       }
     }
 

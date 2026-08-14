@@ -25,7 +25,7 @@ Lee esos archivos en ese orden. Son las fuentes públicas de verdad; no inventes
 - Repository/package: `homebridge-tuya-platform-videolock`.
 - Independent MIT fork of `@0x5e/homebridge-tuya-platform`.
 - Homebridge platform alias: `TuyaPlatform`.
-- Development package version: `1.7.0-videolock.13`.
+- Development package version: `1.7.0-videolock.14`.
 - Previous known-good `.7` runtime rollback commit: `811335a`.
 - Documentation baseline commit: `470892b466dc99b9f7e67481131e807fd1ef32fc`.
 
@@ -39,7 +39,7 @@ Implemented:
 
 - One HomeKit accessory combining `LockMechanism`, a real `Doorbell`, and `CameraController`.
 - A `ContactSensor` preferring `open_close` or `closed_opened` and falling back to `lock_motor_state`, allowing Home notifications when the door opens/unlocks or closes/locks.
-- A forced 30-second `MotionSensor` event from `door_opened`, `open_inside`, or Tuya unlock records, covering opening when the door was already unlocked.
+- A forced 30-second dedicated `ContactSensor` event from `door_opened`, `open_inside`, or Tuya unlock records, covering opening when the door was already unlocked.
 - Doorbell events from Tuya DP codes `doorbell` or `doorbell_call`.
 - Tuya RTSP allocation begins in HomeKit `prepareStream`.
 - FFmpeg converts cloud RTSP into HomeKit SRTP; `options.cameraMaxFPS` selects 15 or 30 fps, defaulting to 15.
@@ -86,7 +86,7 @@ npm pack --dry-run --json
 git add -f dist
 ```
 
-The focused command is the known credential-free baseline: 5 suites and 47 tests. `test/custom.test.ts` and `test/home.test.ts` require a private local `~/.homebridge-dev/config.json`; do not claim the full suite passes unless that fixture exists and the run actually succeeds.
+The focused command is the known credential-free baseline: 5 suites and 48 tests. `test/custom.test.ts` and `test/home.test.ts` require a private local `~/.homebridge-dev/config.json`; do not claim the full suite passes unless that fixture exists and the run actually succeeds.
 
 After editing:
 
