@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.7.0-videolock.11] - 2026-08-13
+
+### Fixed
+- Pass the configured debug flag to `TuyaOpenMQ`, allowing temporary MQTT diagnostics to work as intended.
+
 ## [1.7.0-videolock.10] - 2026-08-13
 
 ### Added

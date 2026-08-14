@@ -39,7 +39,7 @@ export default class TuyaDeviceManager extends EventEmitter {
     const log = (this.api.log as PrefixLogger).log;
     this.log = new PrefixLogger(log, TuyaDeviceManager.name, debug);
 
-    this.mq = new TuyaOpenMQ(api, log);
+    this.mq = new TuyaOpenMQ(api, log, debug);
     this.mq.addMessageListener(this.onMQTTMessage.bind(this));
   }
 

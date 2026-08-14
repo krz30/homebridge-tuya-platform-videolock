@@ -66,7 +66,7 @@ class TuyaDeviceManager extends events_1.default {
         this.debug = debug;
         const log = this.api.log.log;
         this.log = new Logger_1.PrefixLogger(log, TuyaDeviceManager.name, debug);
-        this.mq = new TuyaOpenMQ_1.default(api, log);
+        this.mq = new TuyaOpenMQ_1.default(api, log, debug);
         this.mq.addMessageListener(this.onMQTTMessage.bind(this));
     }
     getDevice(deviceID) {

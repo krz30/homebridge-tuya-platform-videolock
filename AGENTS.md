@@ -25,7 +25,7 @@ Lee esos archivos en ese orden. Son las fuentes públicas de verdad; no inventes
 - Repository/package: `homebridge-tuya-platform-videolock`.
 - Independent MIT fork of `@0x5e/homebridge-tuya-platform`.
 - Homebridge platform alias: `TuyaPlatform`.
-- Development package version: `1.7.0-videolock.10`.
+- Development package version: `1.7.0-videolock.11`.
 - Previous known-good `.7` runtime rollback commit: `811335a`.
 - Documentation baseline commit: `470892b466dc99b9f7e67481131e807fd1ef32fc`.
 
