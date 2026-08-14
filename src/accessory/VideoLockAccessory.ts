@@ -9,7 +9,7 @@ import BaseAccessory from './BaseAccessory';
 const SCHEMA_CODE = {
   LOCK_CURRENT_STATE: ['open_close', 'closed_opened', 'lock_motor_state'],
   LOCK_TARGET_STATE: ['lock_motor_state'],
-  DOOR_CONTACT_STATE: ['open_close', 'closed_opened', 'lock_motor_state'],
+  DOOR_CONTACT_STATE: ['open_close', 'closed_opened'],
   DOOR_OPEN_EVENT: [
     'door_opened',
     'open_inside',
@@ -95,6 +95,10 @@ export default class VideoLockAccessory extends BaseAccessory {
   configureDoorContactState() {
     const schema = this.getSchema(...SCHEMA_CODE.DOOR_CONTACT_STATE);
     if (!schema) {
+      const redundantLockContact = this.accessory.getService(this.Service.ContactSensor);
+      if (redundantLockContact && redundantLockContact.subtype !== 'door-open-event') {
+        this.accessory.removeService(redundantLockContact);
+      }
       return;
     }
 

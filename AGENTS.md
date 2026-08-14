@@ -25,7 +25,7 @@ Lee esos archivos en ese orden. Son las fuentes públicas de verdad; no inventes
 - Repository/package: `homebridge-tuya-platform-videolock`.
 - Independent MIT fork of `@0x5e/homebridge-tuya-platform`.
 - Homebridge platform alias: `TuyaPlatform`.
-- Development package version: `1.7.0-videolock.14`.
+- Development package version: `1.7.0-videolock.15`.
 - Previous known-good `.7` runtime rollback commit: `811335a`.
 - Documentation baseline commit: `470892b466dc99b9f7e67481131e807fd1ef32fc`.
 
@@ -38,7 +38,7 @@ The `videolock` category is selected in `src/accessory/AccessoryFactory.ts` and 
 Implemented:
 
 - One HomeKit accessory combining `LockMechanism`, a real `Doorbell`, and `CameraController`.
-- A `ContactSensor` preferring `open_close` or `closed_opened` and falling back to `lock_motor_state`, allowing Home notifications when the door opens/unlocks or closes/locks.
+- An optional physical-state `ContactSensor` only when `open_close` or `closed_opened` exists; never duplicate `lock_motor_state`, which belongs to `LockMechanism`.
 - A forced 30-second dedicated `ContactSensor` event from `door_opened`, `open_inside`, or Tuya unlock records, covering opening when the door was already unlocked.
 - Doorbell events from Tuya DP codes `doorbell` or `doorbell_call`.
 - Tuya RTSP allocation begins in HomeKit `prepareStream`.
@@ -53,6 +53,8 @@ Not implemented:
 - Two-way audio.
 - Motion-triggered image capture; the motion service is only a short door-opening event.
 - Direct LAN video; the source is allocated through Tuya Cloud.
+
+Do not conflate lock state, physical door state, and repeatable opening events. `lock_motor_state` belongs only to `LockMechanism`; create a physical state contact only for `open_close`/`closed_opened`, and use the dedicated event contact for sticky/event DPs and unlock records. Any service-type change must remove the cached legacy service explicitly.
 
 The persistent preview cache and doorbell snapshot prewarming were intentionally removed because they caused stale previews or competing stream work. Do not restore them without a new design, tests, and explicit user approval.
 

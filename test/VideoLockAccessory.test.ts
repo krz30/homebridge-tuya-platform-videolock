@@ -145,21 +145,17 @@ describe('VideoLockAccessory', () => {
       .toHaveBeenCalledWith(characteristicTypes.ContactSensorState.CONTACT_NOT_DETECTED);
   });
 
-  test('uses lock_motor_state as a contact sensor fallback', () => {
+  test('removes the redundant contact when only lock_motor_state is available', () => {
     const device = mockDeviceManager.getDevice();
     device.schema[0].code = 'lock_motor_state';
     device.status[0].code = 'lock_motor_state';
+    const redundantContact = mockAccessory.addService(serviceTypes.ContactSensor);
 
     const videoLock = new VideoLockAccessory(mockPlatform, mockAccessory);
     videoLock.configureServices();
 
-    const contactService = mockAccessory.getService(serviceTypes.ContactSensor);
-    const contactState = contactService.getCharacteristic(characteristicTypes.ContactSensorState);
-    const getContactState = contactState.onGet.mock.calls[0][0];
-    expect(getContactState()).toBe(characteristicTypes.ContactSensorState.CONTACT_DETECTED);
-
-    device.status[0].value = true;
-    expect(getContactState()).toBe(characteristicTypes.ContactSensorState.CONTACT_NOT_DETECTED);
+    expect(mockAccessory.removeService).toHaveBeenCalledWith(redundantContact);
+    expect(mockAccessory.getService(serviceTypes.ContactSensor)).toBeUndefined();
   });
 
   test('pulses a dedicated contact when the door is opened without changing the lock state', async () => {

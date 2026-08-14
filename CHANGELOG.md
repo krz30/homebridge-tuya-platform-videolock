@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.0-videolock.15] - 2026-08-13
+
+### Fixed
+- Do not create a state Contact Sensor from `lock_motor_state`; the Lock service already represents that same locked/unlocked state.
+- Remove the cached redundant state contact automatically on devices without a physical `open_close` or `closed_opened` DP, leaving only Lock plus the dedicated opening-event contact.
+
 ## [1.7.0-videolock.14] - 2026-08-13
 
 ### Changed
