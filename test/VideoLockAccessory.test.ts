@@ -106,6 +106,7 @@ describe('VideoLockAccessory', () => {
                 onSet: jest.fn().mockReturnThis(),
                 setProps: jest.fn().mockReturnThis(),
                 updateValue: jest.fn().mockReturnThis(),
+                sendEventNotification: jest.fn().mockReturnThis(),
               };
               characteristics.set(characteristicType, characteristic);
               service.characteristics.push(characteristic);
@@ -177,9 +178,9 @@ describe('VideoLockAccessory', () => {
     const motionDetected = motionService.getCharacteristic(characteristicTypes.MotionDetected);
 
     await videoLock.onDeviceStatusUpdate([{ code: 'open_inside', value: true }]);
-    expect(motionDetected.updateValue).toHaveBeenCalledWith(true);
+    expect(motionDetected.sendEventNotification).toHaveBeenCalledWith(true);
 
-    jest.advanceTimersByTime(3 * 1000);
+    jest.advanceTimersByTime(30 * 1000);
     expect(motionDetected.updateValue).toHaveBeenCalledWith(false);
     jest.useRealTimers();
   });
@@ -204,10 +205,10 @@ describe('VideoLockAccessory', () => {
     const motionDetected = motionService.getCharacteristic(characteristicTypes.MotionDetected);
 
     await videoLock.onDeviceStatusUpdate([{ code: 'unlock_fingerprint', value: 1 }]);
-    jest.advanceTimersByTime(3 * 1000);
+    jest.advanceTimersByTime(30 * 1000);
     await videoLock.onDeviceStatusUpdate([{ code: 'unlock_fingerprint', value: 1 }]);
 
-    expect(motionDetected.updateValue.mock.calls.filter(call => call[0] === true)).toHaveLength(2);
+    expect(motionDetected.sendEventNotification).toHaveBeenCalledTimes(2);
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
   });

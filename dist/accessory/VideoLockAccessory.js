@@ -143,9 +143,9 @@ class VideoLockAccessory extends BaseAccessory_1.default {
                 this.log.info('Door opening detected.');
                 const characteristic = this.getDoorOpenEventService()
                     .getCharacteristic(this.Characteristic.MotionDetected);
-                characteristic.updateValue(true);
+                characteristic.sendEventNotification(true);
                 this.doorOpenTimer && clearTimeout(this.doorOpenTimer);
-                this.doorOpenTimer = setTimeout(() => characteristic.updateValue(false), 3 * 1000);
+                this.doorOpenTimer = setTimeout(() => characteristic.updateValue(false), 30 * 1000);
             }
         }
         const doorbellSchema = this.getSchema(...SCHEMA_CODE.DOORBELL_RING);

@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.0-videolock.13] - 2026-08-13
+
+### Fixed
+- Force each door-opening Motion Sensor event through HAP `sendEventNotification`, including repeated unlock records with the same value.
+- Keep the motion state active for 30 seconds before resetting, matching the established camera-motion behavior instead of the previous three-second pulse.
+
 ## [1.7.0-videolock.12] - 2026-08-13
 
 ### Fixed
